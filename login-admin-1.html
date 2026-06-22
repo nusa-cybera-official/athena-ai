@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Admin Login — Athena AI</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;800&display=swap">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;
+      background:linear-gradient(135deg,#1a0533 0%,#2d0a5e 50%,#0a0a1a 100%);
+      padding:20px;color:#fff;}
+
+    .card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);
+      border-radius:24px;padding:36px 32px;width:100%;max-width:400px;
+      backdrop-filter:blur(20px);box-shadow:0 32px 80px rgba(0,0,0,0.5);}
+
+    .logo{text-align:center;margin-bottom:22px;}
+    .logo .owl{font-size:2.6rem;display:block;margin-bottom:6px;}
+    .logo h1{font-size:1.3rem;font-weight:800;letter-spacing:-.02em;}
+    .logo p{font-size:.72rem;color:rgba(255,255,255,0.45);margin-top:3px;letter-spacing:.06em;text-transform:uppercase;}
+
+    .badge-admin{display:inline-flex;align-items:center;gap:6px;
+      background:rgba(241,196,15,0.12);border:1px solid rgba(241,196,15,0.3);
+      color:#f1c40f;font-size:.7rem;font-weight:700;padding:4px 12px;
+      border-radius:999px;margin-bottom:20px;letter-spacing:.04em;}
+
+    /* TABS */
+    .tabs{display:flex;background:rgba(255,255,255,0.06);border-radius:12px;padding:4px;margin-bottom:20px;gap:4px;}
+    .tabs button{flex:1;padding:9px;border-radius:9px;font-size:.8rem;font-weight:700;
+      color:rgba(255,255,255,0.5);background:none;border:none;cursor:pointer;transition:.2s;font-family:inherit;}
+    .tabs button.active{background:rgba(255,255,255,0.12);color:#fff;}
+
+    .tab-panel{display:none;}
+    .tab-panel.active{display:block;}
+
+    .field{margin-bottom:14px;}
+    .field label{display:block;font-size:.76rem;font-weight:700;color:rgba(255,255,255,0.65);margin-bottom:5px;letter-spacing:.03em;}
+    .field input{width:100%;padding:12px 15px;border-radius:11px;
+      border:1.5px solid rgba(255,255,255,0.1);
+      background:rgba(255,255,255,0.06);color:#fff;font-size:.88rem;
+      font-family:inherit;transition:.2s;}
+    .field input:focus{outline:none;border-color:#9b59b6;background:rgba(255,255,255,0.1);}
+    .field input::placeholder{color:rgba(255,255,255,0.28);}
+
+    .btn-main{width:100%;padding:13px;border-radius:12px;border:none;cursor:pointer;
+      background:linear-gradient(90deg,#8e44ad,#f39c12);
+      color:#fff;font-size:.9rem;font-weight:800;font-family:inherit;
+      letter-spacing:.02em;transition:.2s;margin-top:6px;display:flex;align-items:center;justify-content:center;gap:8px;}
+    .btn-main:hover{opacity:.9;transform:translateY(-1px);}
+    .btn-main:disabled{opacity:.55;cursor:not-allowed;transform:none;}
+
+    .msg-box{border-radius:10px;padding:10px 14px;font-size:.79rem;
+      margin-bottom:14px;line-height:1.5;display:none;}
+    .msg-box.error{background:rgba(231,76,60,0.12);border:1px solid rgba(231,76,60,0.3);color:#e74c3c;}
+    .msg-box.success{background:rgba(39,174,96,0.12);border:1px solid rgba(39,174,96,0.3);color:#2ecc71;}
+
+    .divider{height:1px;background:rgba(255,255,255,0.07);margin:18px 0;}
+    .hint{text-align:center;font-size:.72rem;color:rgba(255,255,255,0.32);line-height:1.6;}
+    .hint a{color:rgba(255,255,255,0.48);text-decoration:none;}
+    .hint a:hover{color:#fff;}
+    .security-note{font-size:.7rem;color:rgba(255,255,255,0.28);text-align:center;margin-top:14px;}
+
+    .pw-note{font-size:.72rem;color:rgba(255,255,255,0.4);margin-top:5px;line-height:1.4;}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">
+      <span class="owl">🦉</span>
+      <h1>Athena AI</h1>
+      <p>Admin Portal</p>
+    </div>
+
+    <div style="text-align:center">
+      <span class="badge-admin">🛡️ AKSES TERBATAS — ADMIN ONLY</span>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="active" onclick="switchTab('login')">Masuk</button>
+      <button onclick="switchTab('register')">Buat Akun Admin</button>
+    </div>
+
+    <div class="msg-box error" id="errBox"></div>
+    <div class="msg-box success" id="okBox"></div>
+
+    <!-- LOGIN PANEL -->
+    <div class="tab-panel active" id="panelLogin">
+      <div class="field">
+        <label>Email Admin</label>
+        <input type="email" id="loginEmail" placeholder="email@admin.com" autocomplete="username">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="loginPw" placeholder="••••••••" autocomplete="current-password"
+               onkeydown="if(event.key==='Enter') doLogin()">
+      </div>
+      <button class="btn-main" id="loginBtn" onclick="doLogin()">🔑 Masuk ke Panel Admin</button>
+    </div>
+
+    <!-- REGISTER PANEL -->
+    <div class="tab-panel" id="panelRegister">
+      <p style="font-size:.78rem;color:rgba(255,255,255,0.55);margin-bottom:14px;line-height:1.5;">
+        Hanya email yang terdaftar sebagai admin yang bisa membuat akun di sini.
+      </p>
+      <div class="field">
+        <label>Email Admin</label>
+        <input type="email" id="regEmail" placeholder="email@admin.com" autocomplete="username">
+      </div>
+      <div class="field">
+        <label>Password Baru</label>
+        <input type="password" id="regPw" placeholder="Minimal 8 karakter" autocomplete="new-password">
+        <p class="pw-note">Buat password yang kuat — ini akan digunakan setiap kali login admin.</p>
+      </div>
+      <div class="field">
+        <label>Konfirmasi Password</label>
+        <input type="password" id="regPw2" placeholder="Ulangi password" autocomplete="new-password"
+               onkeydown="if(event.key==='Enter') doRegister()">
+      </div>
+      <button class="btn-main" id="regBtn" onclick="doRegister()">✅ Buat Akun Admin</button>
+    </div>
+
+    <div class="divider"></div>
+    <div class="hint">
+      Halaman ini hanya untuk tim internal Athena AI.<br>
+      Login user biasa? <a href="/">Kembali ke Beranda</a>
+    </div>
+    <div class="security-note">🔒 Koneksi terenkripsi via Supabase Auth</div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://zncsqjbdbfzbzjahormw.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_SLgSnFeVFwEZtRH1Vb3XRg_zgnkWsSu';
+
+    const ADMIN_EMAILS = [
+      'riskyparama4546@gmail.com',
+      'kimlana269@gmail.com',
+      'kumenomikuroo@gmail.com'
+    ];
+
+    function isAdminEmail(email){
+      return ADMIN_EMAILS.map(e=>e.toLowerCase()).includes((email||'').toLowerCase().trim());
+    }
+
+    let sb;
+    try { sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); }
+    catch(e){ showErr('Koneksi Supabase gagal: '+e.message); }
+
+    /* ---- UI helpers ---- */
+    function showErr(msg){ hide('okBox'); show('errBox', msg); }
+    function showOk(msg){  hide('errBox'); show('okBox', msg);  }
+    function hideAll(){ hide('errBox'); hide('okBox'); }
+    function show(id, msg){ const el=document.getElementById(id); el.textContent=msg; el.style.display='block'; }
+    function hide(id){ document.getElementById(id).style.display='none'; }
+
+    function switchTab(tab){
+      hideAll();
+      document.querySelectorAll('.tabs button').forEach((b,i)=>b.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='register')));
+      document.getElementById('panelLogin').classList.toggle('active', tab==='login');
+      document.getElementById('panelRegister').classList.toggle('active', tab==='register');
+    }
+
+    /* ---- LOGIN ---- */
+    async function doLogin(){
+      hideAll();
+      const email = document.getElementById('loginEmail').value.trim();
+      const pw    = document.getElementById('loginPw').value;
+      const btn   = document.getElementById('loginBtn');
+      if (!email||!pw){ showErr('Isi email dan password.'); return; }
+
+      if (!isAdminEmail(email)){
+        showErr('Email ini tidak terdaftar sebagai admin Athena AI.');
+        return;
+      }
+      btn.disabled=true; btn.innerHTML='⏳ Memverifikasi...';
+      try {
+        if (!sb) throw new Error('Supabase tidak tersedia.');
+        const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
+        if (error) throw error;
+        if (!isAdminEmail(data.user.email)){ await sb.auth.signOut(); throw new Error('Akun tidak memiliki hak admin.'); }
+        window.location.href = '/?admin=1#admin';
+      } catch(err){
+        let msg = err.message || 'Login gagal.';
+        if (msg.includes('Invalid login credentials'))
+          msg = 'Email atau password salah. Belum punya akun? Klik tab "Buat Akun Admin".';
+        showErr(msg);
+        btn.disabled=false; btn.innerHTML='🔑 Masuk ke Panel Admin';
+      }
+    }
+
+    /* ---- REGISTER ---- */
+    async function doRegister(){
+      hideAll();
+      const email = document.getElementById('regEmail').value.trim();
+      const pw    = document.getElementById('regPw').value;
+      const pw2   = document.getElementById('regPw2').value;
+      const btn   = document.getElementById('regBtn');
+
+      if (!email||!pw||!pw2){ showErr('Isi semua field.'); return; }
+      if (!isAdminEmail(email)){ showErr('Email ini tidak terdaftar sebagai admin Athena AI.'); return; }
+      if (pw.length < 8){ showErr('Password minimal 8 karakter.'); return; }
+      if (pw !== pw2){ showErr('Konfirmasi password tidak cocok.'); return; }
+
+      btn.disabled=true; btn.innerHTML='⏳ Membuat akun...';
+      try {
+        if (!sb) throw new Error('Supabase tidak tersedia.');
+        const { data, error } = await sb.auth.signUp({ email, password: pw });
+        if (error) throw error;
+        showOk('Akun berhasil dibuat! Silakan login sekarang. (Cek email jika ada verifikasi.)');
+        document.getElementById('regEmail').value='';
+        document.getElementById('regPw').value='';
+        document.getElementById('regPw2').value='';
+        setTimeout(()=>switchTab('login'), 2000);
+      } catch(err){
+        let msg = err.message || 'Gagal membuat akun.';
+        if (msg.includes('already registered')) msg = 'Email ini sudah terdaftar. Silakan login langsung.';
+        showErr(msg);
+      } finally {
+        btn.disabled=false; btn.innerHTML='✅ Buat Akun Admin';
+      }
+    }
+
+    /* ---- Auto-redirect jika sudah ada sesi admin ---- */
+    (async function(){
+      try {
+        if (!sb) return;
+        const { data } = await sb.auth.getSession();
+        if (data?.session?.user && isAdminEmail(data.session.user.email)){
+          window.location.href = '/?admin=1#admin';
+        }
+      } catch(e){}
+    })();
+  </script>
+</body>
+</html>
