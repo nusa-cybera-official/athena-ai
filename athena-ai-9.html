@@ -1,0 +1,2308 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Athena AI - Asisten Kebijaksanaan Menyeluruh</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+:root{
+  --primary:#6C2BD9;
+  --secondary:#9B59B6;
+  --dark:#4A1A8A;
+  --gold:#F1C40F;
+  --white:#FFFFFF;
+  /* === LIGHT THEME — ungu gelap agar card tidak putih di atas background ungu === */
+  --text:#EFE7FB;
+  --text-soft:#c4b3e8;
+  --card-bg:rgba(80,30,160,0.55);
+  --card-solid:rgba(60,20,130,0.80);
+  --border:rgba(255,255,255,0.15);
+  --bg-grad:linear-gradient(135deg,#4A1A8A 0%,#6C2BD9 55%,#9B59B6 100%);
+  --light:rgba(255,255,255,0.10);
+  --shadow:0 18px 50px rgba(74,26,138,0.35);
+}
+[data-theme="dark"]{
+  --text:#EFE7FB;
+  --text-soft:#c4b3e8;
+  --card-bg:rgba(18,8,40,0.80);
+  --card-solid:#120828;
+  --border:rgba(241,196,15,0.15);
+  --bg-grad:linear-gradient(135deg,#0f0820 0%,#1e0d3e 55%,#2d1260 100%);
+  --light:rgba(255,255,255,0.07);
+  --shadow:0 18px 50px rgba(0,0,0,0.55);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',sans-serif;background:var(--bg-grad);color:var(--text);min-height:100vh;transition:background .4s ease,color .3s ease;}
+a{color:inherit;text-decoration:none;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;padding:0;margin:0;-webkit-appearance:none;appearance:none;outline:none;}
+input,textarea,select{font-family:inherit;}
+.owl-logo{font-size:2.2rem;filter:drop-shadow(0 0 12px rgba(241,196,15,0.55));}
+
+/* ---------- Buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 22px;border-radius:12px;font-weight:600;font-size:.92rem;background:linear-gradient(90deg,var(--primary),var(--secondary) 65%,var(--gold));color:#fff;box-shadow:0 8px 20px rgba(108,43,217,0.35);transition:transform .15s,box-shadow .15s;}
+.btn:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(108,43,217,0.45);}
+.btn:active{transform:translateY(0);}
+.btn.btn-outline{background:transparent;color:#fff;box-shadow:none;border:1.5px solid rgba(255,255,255,0.55);}
+.btn.btn-ghost{background:rgba(255,255,255,0.12);color:#fff;box-shadow:none;}
+.btn.btn-sm{padding:7px 14px;font-size:.8rem;border-radius:9px;}
+.btn.btn-danger{background:linear-gradient(90deg,#c0392b,#e74c3c);}
+.btn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+
+/* ---------- Top navigation ---------- */
+.topnav{position:sticky;top:0;z-index:50;background:rgba(20,8,46,0.45);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,0.12);}
+.topnav-inner{max-width:1180px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:12px 22px;gap:14px;}
+.brand-row{display:flex;align-items:center;gap:10px;cursor:pointer;color:#fff;}
+.brand-text span{font-weight:800;font-size:1.05rem;display:block;}
+.brand-text small{color:rgba(255,255,255,0.65);font-size:.66rem;}
+.nav-links{display:flex;gap:4px;}
+.nav-links button{padding:9px 14px;border-radius:10px;background:transparent;color:rgba(255,255,255,0.8);font-weight:600;font-size:.85rem;}
+.nav-links button:hover{background:rgba(255,255,255,0.1);}
+.nav-links button.active{background:rgba(255,255,255,0.16);color:var(--gold);}
+.nav-actions{display:flex;align-items:center;gap:10px;}
+.theme-toggle{display:inline-block;width:40px;height:23px;border-radius:999px;background:rgba(255,255,255,0.22);position:relative;flex-shrink:0;box-shadow:none;-webkit-appearance:none;appearance:none;}
+.theme-toggle::after{content:"";position:absolute;top:2px;left:2px;width:19px;height:19px;border-radius:50%;background:var(--gold);transition:.25s;}
+[data-theme="dark"] .theme-toggle::after{transform:translateX(17px);}
+.user-menu{position:relative;}
+.user-chip{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,0.16);color:#fff;padding:8px 14px;border-radius:999px;font-size:.83rem;font-weight:600;}
+.user-menu-dd{position:absolute;right:0;top:calc(100% + 8px);background:var(--card-solid);border-radius:14px;box-shadow:0 20px 50px rgba(0,0,0,0.3);min-width:170px;padding:8px;display:none;border:1px solid var(--border);}
+.user-menu-dd.show{display:block;}
+.user-menu-dd button{display:block;width:100%;text-align:left;padding:9px 12px;border-radius:9px;color:var(--text);font-size:.84rem;font-weight:600;background:transparent;}
+.user-menu-dd button:hover{background:var(--light);}
+.hamburger{display:none;width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,0.14);color:#fff;align-items:center;justify-content:center;}
+.mobile-drawer{display:none;flex-direction:column;padding:10px 18px 18px;gap:2px;}
+.mobile-drawer button{text-align:left;padding:11px 8px;border-radius:9px;background:transparent;color:rgba(255,255,255,0.85);font-weight:600;font-size:.88rem;}
+.mobile-drawer button.active{color:var(--gold);background:rgba(255,255,255,0.08);}
+@media(max-width:860px){
+  .nav-links{display:none;}
+  .hamburger{display:flex;}
+  .mobile-drawer.open{display:flex;}
+}
+
+/* ---------- Pages / layout ---------- */
+.page{display:none;}
+.page.active{display:block;}
+.container{max-width:1100px;margin:0 auto;padding:34px 20px 70px;}
+.card{background:var(--card-bg);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.12);border-radius:18px;padding:24px;box-shadow:var(--shadow);}
+.card h2{font-size:1.05rem;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.card h2 i{color:var(--gold);}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:22px;}
+@media(max-width:760px){.grid-2{grid-template-columns:1fr;}}
+.empty-note{color:var(--text-soft);font-size:.83rem;text-align:center;padding:18px 0;}
+
+/* ---------- Hero / Home ---------- */
+.hero{text-align:center;padding:60px 20px 30px;color:#fff;}
+.hero .owl-logo{font-size:4.2rem;display:block;margin-bottom:14px;}
+.hero h1{font-size:2rem;font-weight:800;margin-bottom:10px;line-height:1.25;}
+.hero h1 span{color:var(--gold);}
+.hero p.sub{max-width:520px;margin:0 auto 26px;color:rgba(255,255,255,0.82);font-size:.95rem;line-height:1.6;}
+.hero-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;}
+.feature-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:36px;}
+@media(max-width:900px){.feature-grid{grid-template-columns:repeat(2,1fr);}}
+.feature-card{background:var(--card-bg);border:1px solid rgba(255,255,255,0.15);border-radius:16px;padding:18px;text-align:center;}
+.feature-card .emoji{font-size:1.6rem;margin-bottom:8px;}
+.feature-card h3{font-size:.92rem;font-weight:700;margin-bottom:5px;}
+.feature-card p{font-size:.78rem;color:var(--text-soft);line-height:1.5;}
+.guest-banner{background:rgba(241,196,15,0.16);border:1px solid rgba(241,196,15,0.4);border-radius:14px;padding:11px 16px;font-size:.8rem;color:var(--text-soft);display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+.guest-banner strong{color:var(--text);}
+.broadcast-banner{background:linear-gradient(90deg,var(--gold),#f7dc6f);color:#4a3500;padding:11px 22px;font-size:.85rem;font-weight:600;display:flex;justify-content:center;align-items:center;gap:14px;text-align:center;}
+.broadcast-banner button{background:none;color:#4a3500;font-size:1rem;padding:4px 8px;}
+
+/* ---------- About / Team ---------- */
+.principle-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:18px;}
+@media(max-width:760px){.principle-grid{grid-template-columns:1fr;}}
+.principle-card{background:var(--card-bg);border:1px solid rgba(255,255,255,0.15);border-radius:16px;padding:18px;color:var(--text);}
+.principle-card h3{font-size:.92rem;margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+.principle-card p{font-size:.8rem;color:var(--text-soft);line-height:1.55;}
+.page-head{text-align:center;color:#fff;margin-bottom:30px;}
+.page-head h1{font-size:1.7rem;font-weight:800;margin-bottom:8px;}
+.page-head p{color:rgba(255,255,255,0.78);font-size:.9rem;max-width:480px;margin:0 auto;}
+.team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+@media(max-width:760px){.team-grid{grid-template-columns:1fr;}}
+.team-card{background:var(--card-bg);border:1px solid rgba(255,255,255,0.15);border-radius:16px;padding:22px;text-align:center;color:var(--text);}
+.team-card .avatar{width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--gold));display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0 auto 12px;}
+.team-card h3{font-size:.95rem;font-weight:700;}
+.team-card .role{font-size:.78rem;color:var(--gold);margin-top:3px;}
+.team-card .email{font-size:.72rem;color:rgba(255,255,255,0.65);margin-top:5px;word-break:break-all;}
+.team-id-badge{display:inline-block;font-size:.68rem;font-weight:700;padding:2px 10px;border-radius:999px;border:1px solid var(--gold);margin-top:6px;}
+.team-card .bio{font-size:.78rem;color:rgba(255,255,255,0.78);line-height:1.5;margin-top:10px;}
+.team-card .tags{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:10px;}
+.team-card .tags .tag{font-size:.66rem;padding:3px 10px;border-radius:999px;background:rgba(241,196,15,0.1);border:1px solid rgba(241,196,15,0.25);color:rgba(255,255,255,0.85);}
+
+/* ---------- Chat ---------- */
+.chat-toolbar{display:flex;align-items:flex-start;gap:10px;padding:10px 0 6px;flex-wrap:wrap;}
+.mode-tabs{display:flex;gap:6px;flex-wrap:wrap;flex:1;}
+.mode-tabs button{padding:7px 14px;border-radius:999px;background:rgba(255,255,255,0.06);color:var(--text-soft);font-weight:600;font-size:.77rem;border:1.5px solid rgba(255,255,255,0.1);transition:.2s;}
+.mode-tabs button:hover{background:rgba(255,255,255,0.12);}
+.mode-tabs button.active{background:linear-gradient(90deg,var(--primary),var(--secondary));color:#fff;border-color:transparent;}
+.new-chat-btn{flex-shrink:0;padding:7px 14px;border-radius:999px;background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.15);color:var(--text-soft);font-size:.77rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.2s;white-space:nowrap;}
+.new-chat-btn:hover{background:rgba(255,255,255,0.14);color:#fff;}
+.chat-window{flex:1;min-height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:6px 0 14px;background:transparent;margin-bottom:6px;}
+.bubble{max-width:75%;padding:11px 15px;border-radius:16px;font-size:.88rem;line-height:1.5;white-space:pre-wrap;}
+.bubble.user{align-self:flex-end;background:linear-gradient(120deg,var(--primary),var(--secondary));color:#fff;border-bottom-right-radius:4px;}
+.bubble.athena{align-self:flex-start;background:rgba(255,255,255,0.07);color:var(--text);border:1px solid rgba(255,255,255,0.12);border-bottom-left-radius:4px;}
+.bubble.athena.loading{opacity:.7;font-style:italic;}
+.chat-input-row{display:flex;gap:10px;}
+.chat-input-row input{flex:1;padding:13px 16px;border-radius:12px;border:1.5px solid var(--border);background:rgba(255,255,255,0.06);color:var(--text);font-size:.9rem;}
+.chat-input-row input:focus{outline:none;border-color:var(--primary);}
+.chat-input-row .btn{padding:13px 18px;}
+.chat-locked{text-align:center;padding:20px;}
+.chat-locked p{font-size:.85rem;color:var(--text-soft);margin-bottom:14px;}
+
+.wisdom-quote{font-size:1.02rem;font-style:italic;line-height:1.6;color:var(--text);margin-bottom:8px;}
+.wisdom-quote::before{content:"\201C";color:var(--gold);font-size:1.6rem;}
+.wisdom-author{font-size:.82rem;font-weight:700;color:var(--primary);}
+[data-theme="dark"] .wisdom-author{color:var(--gold);}
+.wisdom-cat{font-size:.7rem;background:var(--light);color:var(--text-soft);padding:2px 9px;border-radius:999px;margin-left:6px;}
+
+/* ---------- Login wall (gated pages) ---------- */
+.login-wall{text-align:center;padding:50px 24px;color:#fff;}
+.login-wall i.gate-icon{font-size:2.2rem;color:var(--gold);margin-bottom:14px;display:block;}
+.login-wall h3{font-size:1.15rem;font-weight:800;margin-bottom:8px;}
+.login-wall p{font-size:.86rem;color:rgba(255,255,255,0.78);max-width:380px;margin:0 auto 18px;line-height:1.6;}
+
+/* journal / riwayat / profil */
+textarea.journal-input{width:100%;min-height:90px;border-radius:12px;border:1.5px solid var(--border);background:var(--card-solid);color:var(--text);padding:12px;font-size:.88rem;resize:vertical;margin-bottom:10px;}
+.journal-prompt{font-size:.82rem;color:var(--text-soft);margin-bottom:10px;}
+.journal-entry{border-top:1px solid var(--border);padding:10px 0;font-size:.83rem;}
+.journal-entry .date{color:var(--text-soft);font-size:.7rem;}
+.conv-item{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--border);font-size:.85rem;gap:10px;}
+.conv-item:last-child{border-bottom:none;}
+.conv-mode-badge{font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:999px;background:var(--light);color:var(--primary);flex-shrink:0;}
+[data-theme="dark"] .conv-mode-badge{color:var(--gold);}
+.profile-card{display:flex;align-items:center;gap:18px;margin-bottom:8px;}
+.profile-avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--gold));display:flex;align-items:center;justify-content:center;font-size:1.6rem;color:#fff;flex-shrink:0;}
+.profile-info .name{font-size:1.1rem;font-weight:800;}
+.profile-info .email{font-size:.82rem;color:var(--text-soft);}
+.profile-info .role-badge{display:inline-block;margin-top:4px;font-size:.7rem;font-weight:700;padding:2px 10px;border-radius:999px;background:var(--light);color:var(--primary);}
+
+/* ---------- Auth modal ---------- */
+.modal-overlay{position:fixed;inset:0;background:rgba(20,8,40,0.6);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;}
+.modal-box{background:var(--card-solid);color:var(--text);border-radius:18px;padding:26px;max-width:420px;width:100%;box-shadow:0 30px 70px rgba(0,0,0,0.4);position:relative;}
+.modal-box h3{margin-bottom:16px;font-size:1.05rem;font-weight:800;}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px;}
+.modal-close{position:absolute;top:16px;right:16px;width:30px;height:30px;border-radius:50%;background:var(--light);color:var(--text-soft);display:flex;align-items:center;justify-content:center;}
+.auth-modal-box{text-align:center;}
+.auth-modal-box .owl-logo{font-size:2.2rem;}
+.auth-tabs{display:flex;background:var(--light);border-radius:12px;padding:4px;margin:16px 0 20px;}
+.auth-tabs button{flex:1;padding:9px 0;border-radius:9px;background:transparent;font-weight:600;color:var(--text-soft);font-size:.85rem;}
+.auth-tabs button.active{background:var(--card-solid);color:var(--primary);box-shadow:0 4px 10px rgba(108,43,217,0.18);}
+.field{margin-bottom:14px;text-align:left;}
+.field label{display:block;font-size:.78rem;font-weight:600;color:var(--text-soft);margin-bottom:5px;}
+.field input{width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);background:var(--card-solid);color:var(--text);font-size:.92rem;outline:none;transition:.2s;}
+.field input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(108,43,217,0.15);}
+.auth-error{background:rgba(231,76,60,0.12);color:#c0392b;border-radius:10px;padding:9px 12px;font-size:.8rem;margin-bottom:12px;display:none;text-align:left;}
+.auth-modal-box form .btn{width:100%;margin-top:6px;}
+.auth-success{display:none;background:rgba(39,174,96,0.12);border:1px solid rgba(39,174,96,0.3);color:#27ae60;border-radius:10px;padding:10px 14px;font-size:.8rem;margin-bottom:12px;line-height:1.5;}
+.auth-hint{margin-top:14px;font-size:.72rem;color:var(--text-soft);line-height:1.5;}
+.forgot-link{display:block;text-align:right;font-size:.74rem;color:var(--text-soft);margin-top:5px;cursor:pointer;text-decoration:none;}
+.forgot-link:hover{color:var(--gold);}
+.auth-tabs button{flex:1;font-size:.73rem;padding:8px 4px;}
+
+/* Reset password overlay */
+#resetPwOverlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;}
+#resetPwOverlay.visible{display:flex;}
+.reset-pw-box{background:var(--card-solid);border:1px solid rgba(255,255,255,0.15);border-radius:20px;padding:30px 28px;width:100%;max-width:380px;position:relative;}
+.reset-pw-box h3{font-size:1.1rem;font-weight:800;margin-bottom:6px;}
+.reset-pw-box p{font-size:.8rem;color:var(--text-soft);margin-bottom:18px;line-height:1.5;}
+.reset-pw-box .auth-error{margin-bottom:12px;}
+.reset-pw-box .auth-success{margin-bottom:12px;}
+.pw-strength{height:4px;border-radius:999px;margin-top:6px;transition:.3s;background:rgba(255,255,255,0.1);}
+.pw-strength.weak{background:#e74c3c;}
+.pw-strength.medium{background:#f39c12;}
+.pw-strength.strong{background:#27ae60;}
+
+/* ---------- Pengumuman ---------- */
+.announce-card{background:var(--card-bg);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.1);border-radius:18px;overflow:hidden;box-shadow:var(--shadow);}
+.announce-topbar{height:3px;width:100%;}
+.announce-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:18px 18px 12px;flex-wrap:wrap;}
+.announce-title{font-size:.92rem;font-weight:800;margin-bottom:2px;}
+.announce-date{font-size:.68rem;color:var(--text-soft);font-family:monospace;}
+.announce-badge{padding:3px 10px;border-radius:999px;font-size:.68rem;font-weight:800;border:1px solid;white-space:nowrap;}
+.announce-rules{display:flex;flex-direction:column;gap:12px;padding:4px 18px 18px;}
+.rule-item{display:flex;align-items:flex-start;gap:12px;font-size:.82rem;color:var(--text-soft);line-height:1.65;}
+.rule-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:6px;}
+.announce-footer{padding:12px 18px;border-top:1px solid rgba(255,255,255,0.08);font-size:.72rem;color:var(--text-soft);text-align:center;}
+
+.admin-shell{padding:0;}
+.admin-topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(0,0,0,0.25);position:sticky;top:0;z-index:50;}
+.admin-topbar .btn{padding:8px 14px;font-size:.8rem;}
+.admin-topbar-left{display:flex;align-items:center;gap:10px;}
+/* hamburger — hanya mobile */
+.admin-hamburger{display:none;background:rgba(255,255,255,0.1);border:none;color:#fff;width:36px;height:36px;border-radius:9px;font-size:1rem;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+
+/* Layout */
+.admin-layout{display:flex;min-height:calc(100vh - 50px);}
+
+/* Sidebar desktop */
+aside.admin-sidebar{width:220px;flex-shrink:0;background:linear-gradient(180deg,#2a0e55,#4a1a8a);color:#fff;display:flex;flex-direction:column;padding:18px 0;transition:transform .3s ease;}
+aside.admin-sidebar .brand-row{padding:0 18px 16px;display:flex;align-items:center;gap:10px;}
+.admin-nav{display:flex;flex-direction:column;gap:2px;flex:1;overflow-y:auto;}
+.admin-nav button{text-align:left;padding:11px 18px;background:transparent;color:rgba(255,255,255,0.75);font-size:.83rem;font-weight:600;display:flex;align-items:center;gap:10px;border-left:3px solid transparent;white-space:nowrap;}
+.admin-nav button i{width:16px;text-align:center;font-size:.85rem;}
+.admin-nav button:hover{background:rgba(255,255,255,0.08);}
+.admin-nav button.active{background:rgba(255,255,255,0.14);color:var(--gold);border-left-color:var(--gold);}
+.admin-sidebar-footer{padding:12px 18px 0;border-top:1px solid rgba(255,255,255,0.15);margin-top:8px;}
+.admin-sidebar-footer .admin-name{font-size:.82rem;font-weight:700;}
+.admin-sidebar-footer .admin-role{font-size:.68rem;color:rgba(255,255,255,0.55);margin-bottom:8px;}
+
+/* Main content */
+main.admin-main{flex:1;padding:22px 20px 80px;min-width:0;overflow-x:hidden;}
+main.admin-main h1.page-title,main.admin-main p.page-sub{color:#fff;}
+.admin-main h1.page-title{font-size:1.25rem;font-weight:800;margin-bottom:4px;}
+.admin-main p.page-sub{font-size:.82rem;margin-bottom:18px;color:rgba(255,255,255,0.65);}
+
+/* Stat grid */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
+.stat-card{background:var(--card-bg);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:16px;box-shadow:var(--shadow);}
+.stat-card i{font-size:1.2rem;color:var(--gold);margin-bottom:7px;}
+.stat-card .val{font-size:1.4rem;font-weight:800;}
+.stat-card .lbl{font-size:.74rem;color:var(--text-soft);}
+
+.admin-grid-2{display:grid;grid-template-columns:1.4fr 1fr;gap:18px;margin-bottom:18px;}
+
+/* Bar chart */
+.bar-chart{display:flex;align-items:flex-end;gap:8px;height:140px;padding-top:10px;}
+.bar-chart .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;}
+.bar-chart .bar{width:100%;border-radius:7px 7px 0 0;background:linear-gradient(180deg,var(--gold),var(--primary));}
+.bar-chart .bar-label{font-size:.62rem;color:var(--text-soft);}
+
+/* Tables — scrollable on mobile */
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:14px;}
+table.data-table{width:100%;border-collapse:collapse;font-size:.82rem;min-width:480px;}
+table.data-table th{text-align:left;padding:10px 12px;color:var(--text-soft);font-weight:700;font-size:.7rem;text-transform:uppercase;letter-spacing:.04em;border-bottom:1.5px solid var(--border);white-space:nowrap;}
+table.data-table td{padding:10px 12px;border-bottom:1px solid var(--border);word-break:break-word;}
+table.data-table tr:last-child td{border-bottom:none;}
+
+.badge{font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:999px;}
+.badge.active{background:rgba(46,204,113,0.18);color:#1e8449;}
+.badge.banned{background:rgba(231,76,60,0.18);color:#c0392b;}
+.badge.admin{background:rgba(241,196,15,0.22);color:#9a7d0a;}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+.toolbar input,.toolbar select{padding:8px 12px;border-radius:9px;border:1.5px solid var(--border);background:var(--card-solid);color:var(--text);font-size:.82rem;max-width:100%;}
+.icon-btn{background:var(--light);color:var(--text-soft);width:32px;height:32px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;margin-right:3px;}
+.icon-btn:hover{background:var(--primary);color:#fff;}
+.icon-btn.danger:hover{background:#e74c3c;}
+.section-block{display:none;}
+.section-block.active{display:block;}
+.note-box{background:rgba(241,196,15,0.10);border:1px solid rgba(241,196,15,0.3);border-radius:11px;padding:11px 14px;font-size:.76rem;color:var(--text-soft);margin-bottom:16px;}
+.feedback-card{display:flex;justify-content:space-between;align-items:flex-start;padding:13px 0;border-bottom:1px solid var(--border);gap:10px;}
+.stars i{color:var(--gold);font-size:.8rem;}
+.monitor-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:10px;flex-wrap:wrap;}
+.monitor-bar-track{height:9px;border-radius:999px;background:var(--light);overflow:hidden;flex:1;min-width:120px;}
+.monitor-bar-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--primary),var(--gold));}
+
+/* ====== MOBILE RESPONSIVE ====== */
+@media(max-width:700px){
+  /* Hamburger visible */
+  .admin-hamburger{display:flex;}
+
+  /* Sidebar jadi drawer overlay */
+  aside.admin-sidebar{
+    position:fixed;left:0;top:0;bottom:0;z-index:100;
+    width:240px;transform:translateX(-100%);
+    box-shadow:4px 0 30px rgba(0,0,0,0.5);
+  }
+  aside.admin-sidebar.open{transform:translateX(0);}
+
+  /* Overlay gelap saat sidebar terbuka */
+  .admin-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:99;}
+  .admin-overlay.visible{display:block;}
+
+  /* Brand row di sidebar lebih kompak */
+  aside.admin-sidebar .brand-row{padding:50px 18px 14px;}
+
+  /* Main content full width */
+  .admin-layout{flex-direction:column;}
+  main.admin-main{padding:14px 14px 100px;}
+  .admin-main h1.page-title{font-size:1.1rem;}
+
+  /* Stats 2 kolom */
+  .stat-grid{grid-template-columns:repeat(2,1fr);gap:10px;}
+  .stat-card{padding:13px 12px;}
+  .stat-card .val{font-size:1.2rem;}
+
+  /* Grid 2 col → 1 col */
+  .admin-grid-2{grid-template-columns:1fr;}
+
+  /* Topbar kompak */
+  .admin-topbar{padding:10px 14px;}
+
+  /* Tabel scroll */
+  .table-wrap{border-radius:0;margin:0 -14px;width:calc(100% + 28px);}
+  table.data-table{font-size:.78rem;}
+  table.data-table th,table.data-table td{padding:9px 10px;}
+
+  /* Bottom nav untuk mobile admin */
+  .admin-bottom-nav{
+    display:flex;
+    position:fixed;bottom:0;left:0;right:0;z-index:50;
+    background:rgba(20,8,50,0.96);backdrop-filter:blur(16px);
+    border-top:1px solid rgba(255,255,255,0.1);
+    padding:6px 0 env(safe-area-inset-bottom,6px);
+  }
+  .admin-bottom-nav button{
+    flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+    background:none;border:none;color:rgba(255,255,255,0.5);
+    font-size:.58rem;font-weight:700;padding:6px 2px;cursor:pointer;
+    transition:.15s;
+  }
+  .admin-bottom-nav button i{font-size:1rem;}
+  .admin-bottom-nav button.active{color:var(--gold);}
+  .admin-bottom-nav button:active{transform:scale(.94);}
+
+  /* Bar chart lebih kecil di mobile */
+  .bar-chart{height:110px;gap:5px;}
+  .bar-chart .bar-label{font-size:.58rem;}
+
+  /* Toolbar wrap */
+  .toolbar{gap:8px;}
+  .toolbar input,.toolbar select{font-size:.78rem;}
+}
+
+@media(min-width:701px){
+  .admin-bottom-nav{display:none;}
+  .admin-overlay{display:none!important;}
+}
+
+
+/* Toast */
+#toast-container{position:fixed;top:18px;right:18px;z-index:200;display:flex;flex-direction:column;gap:10px;}
+.toast{background:var(--card-solid);color:var(--text);padding:12px 18px;border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,0.25);font-size:.85rem;font-weight:600;border-left:4px solid var(--primary);animation:slideIn .25s ease;}
+.toast.error{border-left-color:#e74c3c;}
+.toast.success{border-left-color:#27ae60;}
+@keyframes slideIn{from{transform:translateX(40px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+</style>
+</head>
+<body>
+
+<div id="toast-container"></div>
+
+<!-- ===================== TOP NAV (public shell) ===================== -->
+<header class="topnav" id="topNav">
+  <div class="topnav-inner">
+    <div class="brand-row" onclick="showPage('home')">
+      <span class="owl-logo">🦉</span>
+      <div class="brand-text"><span>Athena AI</span><small>Team Apollo AI Studio</small></div>
+    </div>
+    <nav class="nav-links" id="navLinks">
+      <button data-page="home" onclick="showPage('home')">Beranda</button>
+      <button data-page="chat" onclick="showPage('chat')">Chat</button>
+      <button data-page="tentang" onclick="showPage('tentang')">Tentang</button>
+      <button data-page="tim" onclick="showPage('tim')">Tim</button>
+      <button data-page="pengumuman" onclick="showPage('pengumuman')">📋 Pengumuman</button>
+      <button data-page="jurnal" onclick="showPage('jurnal')">Jurnal</button>
+      <button data-page="riwayat" onclick="showPage('riwayat')">Riwayat</button>
+      <a href="/faq" target="_blank" style="padding:7px 14px;border-radius:999px;background:rgba(255,255,255,0.06);color:var(--text-soft);font-size:.82rem;font-weight:600;border:none;cursor:pointer;text-decoration:none;">📖 FAQ</a>
+      <button data-page="admin" id="navAdminLink" onclick="showPage('admin')" style="display:none;">Admin Panel</button>
+    </nav>
+    <div class="nav-actions">
+      <button class="theme-toggle" onclick="toggleTheme()" title="Mode Gelap/Terang"></button>
+      <button class="btn btn-sm" id="navLoginBtn" onclick="openAuthModal('login')"><i class="fa-solid fa-feather"></i> Masuk</button>
+      <div class="user-menu" id="userMenu" style="display:none;">
+        <button class="user-chip" onclick="toggleUserMenuDD()"><i class="fa-solid fa-user"></i> <span id="navUserName">-</span> <i class="fa-solid fa-chevron-down" style="font-size:.65rem;"></i></button>
+        <div class="user-menu-dd" id="userMenuDD">
+          <button onclick="closeUserMenuDD();showPage('profil')"><i class="fa-solid fa-id-card"></i> Profil</button>
+          <button onclick="closeUserMenuDD();showPage('jurnal')"><i class="fa-solid fa-book-open"></i> Jurnal</button>
+          <button onclick="closeUserMenuDD();showPage('riwayat')"><i class="fa-solid fa-clock-rotate-left"></i> Riwayat</button>
+          <button onclick="closeUserMenuDD();logout()"><i class="fa-solid fa-arrow-right-from-bracket"></i> Keluar</button>
+        </div>
+      </div>
+      <button class="hamburger" id="hamburgerBtn" onclick="toggleMobileDrawer()"><i class="fa-solid fa-bars"></i></button>
+    </div>
+  </div>
+  <div class="mobile-drawer" id="mobileDrawer">
+    <button data-page="home" onclick="showPage('home')">Beranda</button>
+    <button data-page="chat" onclick="showPage('chat')">Chat</button>
+    <button data-page="tentang" onclick="showPage('tentang')">Tentang</button>
+    <button data-page="tim" onclick="showPage('tim')">Tim</button>
+    <button data-page="pengumuman" onclick="showPage('pengumuman')">📋 Pengumuman</button>
+    <button data-page="jurnal" onclick="showPage('jurnal')">Jurnal</button>
+    <button data-page="riwayat" onclick="showPage('riwayat')">Riwayat</button>
+    <button data-page="profil" onclick="showPage('profil')">Profil</button>
+    <a href="/faq" target="_blank" style="display:block;padding:10px 22px;color:var(--text-soft);font-size:.86rem;font-weight:600;text-decoration:none;border-left:3px solid transparent;">📖 FAQ & Dokumentasi</a>
+    <button data-page="admin" id="navAdminLinkMobile" onclick="showPage('admin')" style="display:none;">Admin Panel</button>
+  </div>
+</header>
+
+<div class="broadcast-banner" id="broadcastBanner" style="display:none;">
+  <span><i class="fa-solid fa-bullhorn"></i> <span id="broadcastText"></span></span>
+  <button onclick="dismissBroadcast()"><i class="fa-solid fa-xmark"></i></button>
+</div>
+
+<!-- ===================== HOME (public) ===================== -->
+<main id="page-home" class="page active">
+  <div class="hero">
+    <span class="owl-logo">🦉</span>
+    <h1>Temukan <span>Kebijaksanaan</span><br>dalam Setiap Langkah Hidupmu</h1>
+    <p class="sub">Athena AI menemani kamu merenung, mengambil keputusan, dan memahami diri lewat percakapan yang holistik — menggabungkan sains, filsafat, psikologi, dan spiritualitas.</p>
+    <div class="hero-actions">
+      <button class="btn" onclick="showPage('chat')"><i class="fa-solid fa-feather-pointed"></i> Mulai Percakapan Bijak</button>
+      <button class="btn btn-outline" onclick="showPage('tentang')">Tentang Athena</button>
+    </div>
+  </div>
+  <div class="container">
+    <div class="feature-grid">
+      <div class="feature-card"><div class="emoji">🦉</div><h3>Wisdom</h3><p>Perspektif mendalam ala filsuf untuk masalah sehari-hari.</p></div>
+      <div class="feature-card"><div class="emoji">🎯</div><h3>Strategy</h3><p>Bantu menyusun langkah konkret dari kebingungan menjadi rencana.</p></div>
+      <div class="feature-card"><div class="emoji">💜</div><h3>Empathy</h3><p>Ruang aman untuk didengar tanpa dihakimi.</p></div>
+      <div class="feature-card"><div class="emoji">🪞</div><h3>Reflection</h3><p>Pertanyaan reflektif yang membawamu mengenal diri lebih dalam.</p></div>
+    </div>
+    <div class="card" style="margin-top:34px;">
+      <h2><i class="fa-solid fa-sun"></i> Kebijaksanaan Hari Ini</h2>
+      <div id="homeWisdomBox"></div>
+    </div>
+  </div>
+</main>
+
+<!-- ===================== TENTANG (public) ===================== -->
+<main id="page-tentang" class="page">
+  <div class="container">
+    <div class="page-head">
+      <h1>Tentang Athena AI</h1>
+      <p>Dewi kebijaksanaan digital, dikembangkan oleh Team Apollo AI Studio.</p>
+    </div>
+    <div class="card" style="color:#fff;background:rgba(255,255,255,0.08);margin-bottom:24px;">
+      <p style="font-size:.92rem;line-height:1.7;">Athena AI hadir untuk membantu siapa pun menemukan kebijaksanaan di tengah kerumitan hidup. Berbeda dari asisten AI yang berorientasi tugas, Athena dirancang untuk reflektif dan multidimensional — mendengarkan dulu, baru menawarkan perspektif baru dengan lembut, lewat metafora dan pertanyaan ala Socrates.</p>
+    </div>
+    <div class="principle-grid">
+      <div class="principle-card"><h3>🌐 Holistik</h3><p>Mempertimbangkan semua aspek: rasional, emosional, spiritual, dan praktis sebelum memberi pandangan.</p></div>
+      <div class="principle-card"><h3>🤍 Tidak Menghakimi</h3><p>Semua pertanyaan dan keresahan valid untuk dibahas, tanpa label benar-salah yang kaku.</p></div>
+      <div class="principle-card"><h3>🪞 Reflektif</h3><p>Mendorongmu berpikir lebih dalam, bukan sekadar memberi jawaban instan.</p></div>
+      <div class="principle-card"><h3>🔗 Terintegrasi</h3><p>Menggabungkan sains, filsafat, psikologi, dan spiritualitas dalam satu sudut pandang.</p></div>
+    </div>
+  </div>
+</main>
+
+<!-- ===================== TIM (public) ===================== -->
+<main id="page-tim" class="page">
+  <div class="container">
+    <div class="page-head">
+      <h1>Tim Apollo AI Studio</h1>
+      <p>Orang-orang di balik pengembangan dan pengelolaan Athena AI.</p>
+    </div>
+    <div class="team-grid" id="teamGrid"></div>
+  </div>
+</main>
+
+<!-- ===================== CHAT (public, guest-limited) ===================== -->
+<main id="page-chat" class="page">
+  <div class="container">
+    <div class="guest-banner" id="guestBanner" style="display:none;">
+      <span><i class="fa-solid fa-circle-info"></i> Kamu chat sebagai tamu. Sisa <strong id="guestRemainingCount">-</strong> chat gratis.</span>
+      <button class="btn btn-sm" onclick="openAuthModal('login')">Login untuk Tanpa Batas</button>
+    </div>
+    <div class="chat-toolbar">
+      <div class="mode-tabs" id="modeTabs">
+        <button class="active" data-mode="wisdom" onclick="setMode('wisdom')">🦉 Wisdom</button>
+        <button data-mode="strategy" onclick="setMode('strategy')">🎯 Strategy</button>
+        <button data-mode="empathy" onclick="setMode('empathy')">💜 Empathy</button>
+        <button data-mode="reflection" onclick="setMode('reflection')">🪞 Reflection</button>
+        <button data-mode="career" onclick="setMode('career')">💼 Karier</button>
+        <button data-mode="relationship" onclick="setMode('relationship')">💞 Relasi</button>
+        <button data-mode="mindfulness" onclick="setMode('mindfulness')">🧘 Mindfulness</button>
+      </div>
+      <button class="new-chat-btn" onclick="confirmNewChat()"><i class="fa-solid fa-plus"></i> Chat Baru</button>
+    </div>
+    <div class="chat-window" id="chatWindow"></div>
+    <div id="chatInputArea">
+      <div class="chat-input-row">
+        <input type="text" id="chatInput" placeholder="Tulis pertanyaan atau keresahanmu di sini..." onkeydown="if(event.key==='Enter')sendChatMessage()">
+        <button class="btn" onclick="sendChatMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ===================== JURNAL (login required) ===================== -->
+<main id="page-jurnal" class="page">
+  <div class="container">
+    <div class="login-wall" id="jurnalLoginWall">
+      <i class="fa-solid fa-lock gate-icon"></i>
+      <h3>Login Dulu</h3>
+      <p>Jurnal Refleksi tersimpan khusus untuk akunmu. Masuk atau daftar untuk mulai menulis refleksi harianmu.</p>
+      <button class="btn" onclick="openAuthModal('login')">Login Sekarang</button>
+    </div>
+    <div id="jurnalContent" style="display:none;">
+      <div class="page-head"><h1>Jurnal Refleksi</h1></div>
+      <div class="card">
+        <p class="journal-prompt" id="journalPrompt">Apa satu hal yang membuatmu bersyukur hari ini?</p>
+        <textarea class="journal-input" id="journalInput" placeholder="Tulis refleksimu..."></textarea>
+        <button class="btn btn-sm" onclick="saveJournalEntry()"><i class="fa-solid fa-floppy-disk"></i> Simpan Refleksi</button>
+        <div id="journalEntries" style="margin-top:14px;"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ===================== RIWAYAT (login required) ===================== -->
+<main id="page-riwayat" class="page">
+  <div class="container">
+    <div class="login-wall" id="riwayatLoginWall">
+      <i class="fa-solid fa-lock gate-icon"></i>
+      <h3>Login Dulu</h3>
+      <p>Masuk untuk melihat riwayat percakapanmu dengan Athena AI.</p>
+      <button class="btn" onclick="openAuthModal('login')">Login Sekarang</button>
+    </div>
+    <div id="riwayatContent" style="display:none;">
+      <div class="page-head"><h1>Riwayat Percakapan</h1></div>
+      <div class="card"><div id="recentConversations"></div></div>
+    </div>
+  </div>
+</main>
+
+<!-- ===================== PROFIL (login required) ===================== -->
+<main id="page-profil" class="page">
+  <div class="container">
+    <div class="login-wall" id="profilLoginWall">
+      <i class="fa-solid fa-lock gate-icon"></i>
+      <h3>Login Dulu</h3>
+      <p>Masuk untuk melihat dan mengelola profil akunmu.</p>
+      <button class="btn" onclick="openAuthModal('login')">Login Sekarang</button>
+    </div>
+    <div id="profilContent" style="display:none;">
+      <div class="page-head"><h1>Profil</h1></div>
+      <div class="card">
+        <div class="profile-card">
+          <div class="profile-avatar"><i class="fa-solid fa-user"></i></div>
+          <div class="profile-info">
+            <div class="name" id="profileName">-</div>
+            <div class="email" id="profileEmail">-</div>
+            <span class="role-badge" id="profileRole">User</span>
+          </div>
+        </div>
+        <button class="btn btn-sm btn-outline" style="color:var(--primary);border-color:var(--primary);margin-top:14px;" onclick="toggleTheme()"><i class="fa-solid fa-circle-half-stroke"></i> Ganti Mode Gelap/Terang</button>
+        <button class="btn btn-sm btn-danger" style="margin-top:14px;margin-left:8px;" onclick="logout()"><i class="fa-solid fa-arrow-right-from-bracket"></i> Keluar</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ===================== PENGUMUMAN RESMI ===================== -->
+<main id="page-pengumuman" class="page">
+  <div class="container" style="padding-bottom:80px;">
+
+    <!-- Header -->
+    <div style="text-align:center;padding:28px 0 20px;">
+      <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(241,196,15,0.12);border:1px solid rgba(241,196,15,0.3);color:var(--gold);font-size:.72rem;font-weight:800;padding:4px 14px;border-radius:999px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px;">📋 Resmi</span>
+      <h1 style="font-size:1.4rem;font-weight:800;margin:0 0 8px;">Pengumuman Resmi</h1>
+      <p style="font-size:.84rem;color:var(--text-soft);margin:0;line-height:1.6;">Aturan penggunaan, kebijakan, dan pernyataan resmi dari Tim Athena AI.</p>
+    </div>
+
+    <!-- ATURAN PENGGUNAAN -->
+    <div class="announce-card" style="--accent:#f59e0b;">
+      <div class="announce-topbar" style="background:linear-gradient(90deg,#f59e0b,#d97706);"></div>
+      <div class="announce-head">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:1.5rem;">📜</span>
+          <div>
+            <div class="announce-title" style="color:#f59e0b;">Aturan Penggunaan Athena AI</div>
+            <div class="announce-date">Juni 2026 · Berlaku</div>
+          </div>
+        </div>
+        <span class="announce-badge" style="background:rgba(245,158,11,0.12);border-color:rgba(245,158,11,0.35);color:#f59e0b;">BERLAKU</span>
+      </div>
+      <div class="announce-rules">
+        <div class="rule-item">
+          <span class="rule-dot" style="background:#f59e0b;"></span>
+          <div><strong style="color:#fcd34d;">Gunakan dengan Niat Baik</strong><br>Athena AI hadir untuk membantu kamu tumbuh, merenungkan hidup, dan menemukan kebijaksanaan. Gunakan dengan niat yang positif dan tulus.</div>
+        </div>
+        <div class="rule-item">
+          <span class="rule-dot" style="background:#a78bfa;"></span>
+          <div><strong style="color:#c4b5fd;">Dilarang Konten Berbahaya</strong><br>Dilarang keras menggunakan Athena AI untuk menghasilkan konten ilegal, berbahaya, menghasut kekerasan, pornografi, atau merugikan orang lain.</div>
+        </div>
+        <div class="rule-item">
+          <span class="rule-dot" style="background:#34d399;"></span>
+          <div><strong style="color:#6ee7b7;">Batasan Tamu</strong><br>Pengguna tanpa login dibatasi <strong style="color:#f59e0b;">15 pesan gratis</strong>. Daftar akun gratis untuk akses percakapan tanpa batas.</div>
+        </div>
+        <div class="rule-item">
+          <span class="rule-dot" style="background:#f87171;"></span>
+          <div><strong style="color:#fca5a5;">Dilarang Manipulasi AI</strong><br>Percobaan jailbreak, prompt injection, atau manipulasi sistem Athena AI akan terdeteksi otomatis, dicatat, dan dilaporkan ke tim admin.</div>
+        </div>
+        <div class="rule-item">
+          <span class="rule-dot" style="background:#60a5fa;"></span>
+          <div><strong style="color:#93c5fd;">Privasi Percakapan</strong><br>Percakapanmu bersifat pribadi. Admin hanya menerima notifikasi jika sistem mendeteksi percobaan penyalahgunaan — bukan isi penuh percakapan.</div>
+        </div>
+        <div class="rule-item">
+          <span class="rule-dot" style="background:#fb923c;"></span>
+          <div><strong style="color:#fdba74;">Konsekuensi Pelanggaran</strong><br>Pelanggaran aturan akan mengakibatkan ban akun secara permanen tanpa peringatan sebelumnya.</div>
+        </div>
+        <div class="rule-item">
+          <span class="rule-dot" style="background:#e879f9;"></span>
+          <div><strong style="color:#f0abfc;">Pembaruan Kebijakan</strong><br>Tim Athena AI berhak memperbarui aturan ini sewaktu-waktu. Pembaruan akan diumumkan di halaman ini.</div>
+        </div>
+      </div>
+      <div class="announce-footer">Ditandatangani: <strong style="color:var(--gold);">Risky Pratama · Kim Lana · Dei</strong> — Tim Athena AI</div>
+    </div>
+
+    <!-- KEAMANAN -->
+    <div class="announce-card" style="--accent:#a78bfa;margin-top:14px;">
+      <div class="announce-topbar" style="background:linear-gradient(90deg,#7c3aed,#a855f7);"></div>
+      <div class="announce-head">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:1.5rem;">🛡️</span>
+          <div>
+            <div class="announce-title" style="color:#c084fc;">Sistem Keamanan Athena AI</div>
+            <div class="announce-date">Juni 2026 · Aktif</div>
+          </div>
+        </div>
+        <span class="announce-badge" style="background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.3);color:#86efac;">✅ AKTIF</span>
+      </div>
+      <div class="announce-rules">
+        <div class="rule-item">
+          <span style="font-size:1.1rem;flex-shrink:0;">🔒</span>
+          <div style="font-size:.82rem;color:var(--text-soft);line-height:1.6;"><strong style="color:var(--text);">System Prompt Diperketat</strong> — Athena AI menolak keras semua konten berbahaya dan tidak etis tanpa terkecuali.</div>
+        </div>
+        <div class="rule-item">
+          <span style="font-size:1.1rem;flex-shrink:0;">🤖</span>
+          <div style="font-size:.82rem;color:var(--text-soft);line-height:1.6;"><strong style="color:var(--text);">Filter Jailbreak Otomatis</strong> — Lebih dari 30 pola manipulasi AI terdeteksi secara otomatis sebelum pesan dikirim.</div>
+        </div>
+        <div class="rule-item">
+          <span style="font-size:1.1rem;flex-shrink:0;">📊</span>
+          <div style="font-size:.82rem;color:var(--text-soft);line-height:1.6;"><strong style="color:var(--text);">Monitoring Real-Time</strong> — Aktivitas anomali terpantau oleh sistem dan dilaporkan ke admin secara otomatis.</div>
+        </div>
+        <div class="rule-item">
+          <span style="font-size:1.1rem;flex-shrink:0;">🚫</span>
+          <div style="font-size:.82rem;color:var(--text-soft);line-height:1.6;"><strong style="color:var(--text);">Eksploitasi = Ban Permanen</strong> — Akun yang terbukti menyalahgunakan Athena AI akan diban permanen tanpa toleransi.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BROADCAST DINAMIS DARI ADMIN -->
+    <div id="pengumumanDinamisWrap" style="margin-top:14px;"></div>
+
+    <!-- FOOTER -->
+    <div style="margin-top:20px;padding:16px;text-align:center;font-size:.74rem;color:var(--text-soft);line-height:1.8;border-top:1px solid rgba(255,255,255,0.08);">
+      Pertanyaan? Hubungi tim kami via email<br>
+      <strong style="color:var(--gold);">riskyparama4546@gmail.com</strong><br>
+      <a href="/faq" style="color:#c084fc;text-decoration:none;font-weight:700;">📖 FAQ & Dokumentasi</a> ·
+      <span style="font-size:.68rem;opacity:.6;">© 2026 Athena AI · Tim Apollo AI Indonesia</span>
+    </div>
+
+  </div>
+</main>
+<main id="page-admin" class="page admin-shell">
+  <div class="admin-overlay" id="adminOverlay" onclick="closeAdminSidebar()"></div>
+  <div class="admin-topbar">
+    <div class="admin-topbar-left">
+      <button class="admin-hamburger" onclick="toggleAdminSidebar()"><i class="fa-solid fa-bars"></i></button>
+      <span style="color:#fff;font-weight:700;font-size:.85rem;"><i class="fa-solid fa-shield-halved"></i> Admin Panel</span>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="showPage('home')"><i class="fa-solid fa-arrow-left"></i> Beranda</button>
+  </div>
+  <div class="admin-layout">
+    <aside class="admin-sidebar" id="adminSidebar">
+      <div class="brand-row">
+        <span class="owl-logo" style="font-size:1.5rem;">🦉</span>
+        <div class="brand-text"><span>Athena AI</span><small>Admin Panel</small></div>
+      </div>
+      <nav class="admin-nav" id="adminNav">
+        <button class="active" data-section="dashboard" onclick="showAdminSection('dashboard')"><i class="fa-solid fa-gauge-high"></i> Dashboard</button>
+        <button data-section="users" onclick="showAdminSection('users')"><i class="fa-solid fa-users"></i> Users</button>
+        <button data-section="wisdom" onclick="showAdminSection('wisdom')"><i class="fa-solid fa-scroll"></i> Wisdom Content</button>
+        <button data-section="conversations" onclick="showAdminSection('conversations')"><i class="fa-solid fa-comments"></i> Conversations</button>
+        <button data-section="system" onclick="showAdminSection('system')"><i class="fa-solid fa-server"></i> System Monitor</button>
+        <button data-section="moderation" onclick="showAdminSection('moderation')"><i class="fa-solid fa-shield-halved"></i> Moderation</button>
+        <button data-section="feedback" onclick="showAdminSection('feedback')"><i class="fa-solid fa-comment-dots"></i> Feedback</button>
+        <button data-section="team" onclick="showAdminSection('team')"><i class="fa-solid fa-people-group"></i> Team</button>
+        <button data-section="broadcast" onclick="showAdminSection('broadcast')"><i class="fa-solid fa-bullhorn"></i> Broadcast</button>
+        <button data-section="settings" onclick="showAdminSection('settings')"><i class="fa-solid fa-gear"></i> Settings</button>
+      </nav>
+      <div class="admin-sidebar-footer">
+        <div class="admin-name" id="adminNameLabel">Admin</div>
+        <div class="admin-role">Administrator</div>
+        <button class="btn btn-ghost btn-sm" style="width:100%;" onclick="logout()"><i class="fa-solid fa-arrow-right-from-bracket"></i> Keluar</button>
+      </div>
+    </aside>
+
+    <main class="admin-main">
+      <section class="section-block active" id="sec-dashboard">
+        <h1 class="page-title">Dashboard</h1>
+        <p class="page-sub">Ringkasan aktivitas Athena AI secara menyeluruh.</p>
+        <div class="stat-grid">
+          <div class="stat-card"><i class="fa-solid fa-users"></i><div class="val" id="statUsers">-</div><div class="lbl">Total Users</div></div>
+          <div class="stat-card"><i class="fa-solid fa-comments"></i><div class="val" id="statConv">-</div><div class="lbl">Total Conversations</div></div>
+          <div class="stat-card"><i class="fa-solid fa-scroll"></i><div class="val" id="statWisdom">-</div><div class="lbl">Wisdom Shared</div></div>
+          <div class="stat-card"><i class="fa-solid fa-star"></i><div class="val" id="statSatisfaction">-</div><div class="lbl">Satisfaction Score</div></div>
+        </div>
+        <div class="admin-grid-2">
+          <div class="card"><h2><i class="fa-solid fa-chart-column"></i> Aktivitas Pengguna (7 hari)</h2>
+            <div class="bar-chart" id="userActivityChart"></div>
+            <div style="display:flex;gap:14px;margin-top:10px;font-size:.7rem;color:var(--text-soft);">
+              <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:linear-gradient(180deg,var(--gold),var(--primary));margin-right:4px;"></span>Total Aktivitas</span>
+              <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(255,255,255,0.3);margin-right:4px;"></span>User Baru</span>
+              <span style="margin-left:auto;color:var(--gold);">• = Hari ini</span>
+            </div>
+          </div>
+          <div class="card"><h2><i class="fa-solid fa-lightbulb"></i> AI Insight</h2><p style="font-size:.85rem;line-height:1.6;color:var(--text-soft);" id="aiInsightText">Memuat insight...</p></div>
+        </div>
+        <div class="card">
+          <h2><i class="fa-solid fa-user-clock"></i> Pengguna Terbaru</h2>
+          <table class="data-table" id="recentUsersTable"><thead><tr><th>Nama</th><th>Email</th><th>Bergabung</th><th>Status</th></tr></thead><tbody></tbody></table>
+        </div>
+      </section>
+
+      <section class="section-block" id="sec-users">
+        <h1 class="page-title">User Management</h1>
+        <p class="page-sub">Kelola seluruh pengguna Athena AI.</p>
+        <div class="note-box"><i class="fa-solid fa-circle-info"></i> Operasi admin (lihat semua user, ban, hapus) memerlukan <strong>service role key</strong> di backend yang aman. Karena halaman ini hanya memakai anon key Supabase di sisi klien, fitur ini berjalan dalam mode demo dengan data simulasi bila API admin tidak dapat diakses langsung dari browser.</div>
+        <div class="toolbar">
+          <input type="text" id="userSearchInput" placeholder="Cari nama atau email..." oninput="renderUsersTable()">
+          <select id="userRoleFilter" onchange="renderUsersTable()">
+            <option value="">Semua Role</option><option value="admin">Admin</option><option value="user">User</option>
+          </select>
+        </div>
+        <div class="card"><div class="table-wrap"><table class="data-table"><thead><tr><th>Nama</th><th>Email</th><th>Role</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="usersTableBody"></tbody></table></div></div>
+      </section>
+
+      <section class="section-block" id="sec-wisdom">
+        <h1 class="page-title">Wisdom Content Management</h1>
+        <p class="page-sub">Kelola kutipan kebijaksanaan yang dibagikan ke pengguna.</p>
+        <div class="toolbar">
+          <select id="wisdomCategoryFilter" onchange="renderWisdomTable()">
+            <option value="">Semua Kategori</option><option value="Philosophy">Philosophy</option><option value="Buddhist">Buddhist</option><option value="Stoic">Stoic</option><option value="Eastern">Eastern</option><option value="Inspirational">Inspirational</option>
+          </select>
+          <button class="btn btn-sm" onclick="openWisdomModal()"><i class="fa-solid fa-plus"></i> Tambah Wisdom</button>
+        </div>
+        <div class="card"><div class="table-wrap"><table class="data-table"><thead><tr><th>Kutipan</th><th>Penulis</th><th>Kategori</th><th>Aksi</th></tr></thead><tbody id="wisdomTableBody"></tbody></table></div></div>
+      </section>
+
+      <section class="section-block" id="sec-conversations">
+        <h1 class="page-title">Conversations Viewer</h1>
+        <p class="page-sub">Pantau percakapan pengguna dengan Athena AI.</p>
+        <div class="note-box"><i class="fa-solid fa-circle-info"></i> Demo ini menampilkan percakapan (termasuk dari tamu) yang tercatat pada perangkat/browser ini saja. Untuk agregasi lintas perangkat secara penuh, percakapan perlu disimpan di tabel Supabase melalui backend.</div>
+        <div class="card"><div class="table-wrap"><table class="data-table"><thead><tr><th>Pengguna</th><th>Mode</th><th>Pesan Terakhir</th><th>Waktu</th></tr></thead><tbody id="allConvTableBody"></tbody></table></div></div>
+      </section>
+
+      <section class="section-block" id="sec-system">
+        <h1 class="page-title">System Monitor</h1>
+        <p class="page-sub">Status kesehatan sistem Athena AI secara real-time (simulasi).</p>
+        <div class="card">
+          <div class="monitor-row"><span>API Proxy Latency</span><strong id="mLatencyVal">-</strong></div>
+          <div class="monitor-bar-track" style="margin-bottom:18px;"><div class="monitor-bar-fill" id="mLatencyBar" style="width:0%"></div></div>
+          <div class="monitor-row"><span>Server Load (CPU)</span><strong id="mCpuVal">-</strong></div>
+          <div class="monitor-bar-track" style="margin-bottom:18px;"><div class="monitor-bar-fill" id="mCpuBar" style="width:0%"></div></div>
+          <div class="monitor-row"><span>Memory Usage</span><strong id="mMemVal">-</strong></div>
+          <div class="monitor-bar-track" style="margin-bottom:18px;"><div class="monitor-bar-fill" id="mMemBar" style="width:0%"></div></div>
+          <div class="monitor-row"><span>Supabase Connection</span><strong id="mSupaVal" style="color:#27ae60;">Checking...</strong></div>
+          <button class="btn btn-sm" onclick="refreshSystemMonitor()"><i class="fa-solid fa-rotate"></i> Refresh</button>
+        </div>
+      </section>
+
+      <section class="section-block" id="sec-moderation">
+        <h1 class="page-title">Moderation</h1>
+        <p class="page-sub">Tinjau konten yang ditandai oleh sistem atau pengguna.</p>
+        <div class="card"><div id="moderationList"></div></div>
+      </section>
+
+      <section class="section-block" id="sec-feedback">
+        <h1 class="page-title">Feedback</h1>
+        <p class="page-sub">Masukan dari pengguna Athena AI.</p>
+        <div class="card"><div id="feedbackList"></div></div>
+      </section>
+
+      <section class="section-block" id="sec-team">
+        <h1 class="page-title">Team</h1>
+        <p class="page-sub">Tim Apollo AI Studio di balik Athena AI.</p>
+        <div class="team-grid" id="teamGridAdmin"></div>
+      </section>
+
+      <section class="section-block" id="sec-broadcast">
+        <h1 class="page-title">Broadcast</h1>
+        <p class="page-sub">Kirim pengumuman ke seluruh pengguna Athena AI (tampil sebagai banner di halaman publik).</p>
+        <div class="card">
+          <textarea class="journal-input" id="broadcastInput" placeholder="Tulis pesan broadcast..."></textarea>
+          <button class="btn" onclick="sendBroadcast()"><i class="fa-solid fa-bullhorn"></i> Kirim Broadcast</button>
+          <p id="lastBroadcastInfo" style="margin-top:14px;font-size:.8rem;color:var(--text-soft);"></p>
+        </div>
+      </section>
+
+      <section class="section-block" id="sec-settings">
+        <h1 class="page-title">Settings</h1>
+        <p class="page-sub">Pengaturan sistem Athena AI.</p>
+        <div class="card" style="margin-bottom:18px;">
+          <h2><i class="fa-solid fa-palette"></i> Tampilan</h2>
+          <p style="font-size:.85rem;color:var(--text-soft);margin-bottom:12px;">Mode tampilan saat ini: <strong id="settingsThemeLabel">Light</strong></p>
+          <button class="btn btn-sm btn-outline" style="color:var(--primary);border-color:var(--primary);" onclick="toggleTheme()"><i class="fa-solid fa-circle-half-stroke"></i> Ganti Mode Gelap/Terang</button>
+        </div>
+        <div class="card">
+          <h2><i class="fa-solid fa-database"></i> Data Wisdom</h2>
+          <p style="font-size:.85rem;color:var(--text-soft);margin-bottom:12px;">Kembalikan daftar kebijaksanaan ke 10 kutipan default jika konten sudah berubah terlalu jauh.</p>
+          <button class="btn btn-sm btn-danger" onclick="resetWisdomData()"><i class="fa-solid fa-rotate-left"></i> Reset ke Default</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Bottom nav khusus mobile admin -->
+  <nav class="admin-bottom-nav" id="adminBottomNav">
+    <button data-section="dashboard" onclick="showAdminSection('dashboard')" class="active"><i class="fa-solid fa-gauge-high"></i>Dashboard</button>
+    <button data-section="users" onclick="showAdminSection('users')"><i class="fa-solid fa-users"></i>Users</button>
+    <button data-section="wisdom" onclick="showAdminSection('wisdom')"><i class="fa-solid fa-scroll"></i>Wisdom</button>
+    <button data-section="broadcast" onclick="showAdminSection('broadcast')"><i class="fa-solid fa-bullhorn"></i>Broadcast</button>
+    <button onclick="toggleAdminSidebar()"><i class="fa-solid fa-bars"></i>Menu</button>
+  </nav>
+</main>
+
+<!-- ===================== AUTH MODAL ===================== -->
+<div class="modal-overlay" id="authModalOverlay" style="display:none;" onclick="if(event.target===this) closeAuthModal()">
+  <div class="modal-box auth-modal-box">
+    <button class="modal-close" onclick="closeAuthModal()"><i class="fa-solid fa-xmark"></i></button>
+    <span class="owl-logo">🦉</span>
+    <h3 style="margin-top:8px;" id="authModalTitle">Masuk ke Athena AI</h3>
+    <div class="auth-tabs">
+      <button id="tabLoginBtn" class="active" onclick="switchAuthModalTab('login')">Masuk</button>
+      <button id="tabRegisterBtn" onclick="switchAuthModalTab('register')">Daftar</button>
+      <button id="tabForgotBtn" onclick="switchAuthModalTab('forgot')">Lupa Password</button>
+    </div>
+    <div class="auth-error" id="authError"></div>
+    <div class="auth-success" id="authSuccess"></div>
+
+    <form id="loginForm" onsubmit="handleLogin(event)">
+      <div class="field"><label>Email</label><input type="email" id="loginEmail" required placeholder="nama@email.com"></div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="loginPassword" required placeholder="••••••••">
+        <a class="forgot-link" onclick="switchAuthModalTab('forgot')" href="#">Lupa password?</a>
+      </div>
+      <button type="submit" class="btn" id="loginSubmitBtn"><i class="fa-solid fa-feather"></i> Masuk</button>
+    </form>
+
+    <form id="registerForm" onsubmit="handleRegister(event)" style="display:none;">
+      <div class="field"><label>Nama Lengkap</label><input type="text" id="regName" required placeholder="Nama kamu"></div>
+      <div class="field"><label>Email</label><input type="email" id="regEmail" required placeholder="nama@email.com"></div>
+      <div class="field"><label>Password</label><input type="password" id="regPassword" required minlength="6" placeholder="Minimal 6 karakter"></div>
+      <div class="field"><label>Konfirmasi Password</label><input type="password" id="regPasswordConfirm" required minlength="6" placeholder="Ulangi password"></div>
+      <button type="submit" class="btn" id="registerSubmitBtn"><i class="fa-solid fa-user-plus"></i> Daftar</button>
+    </form>
+
+    <form id="forgotForm" onsubmit="handleForgotPassword(event)" style="display:none;">
+      <p style="font-size:.8rem;color:var(--text-soft);margin-bottom:14px;line-height:1.5;">
+        Masukkan email kamu dan kami akan kirim link untuk reset password.
+      </p>
+      <div class="field"><label>Email</label><input type="email" id="forgotEmail" required placeholder="nama@email.com"></div>
+      <button type="submit" class="btn" id="forgotSubmitBtn"><i class="fa-solid fa-paper-plane"></i> Kirim Link Reset</button>
+    </form>
+
+    <p class="auth-hint" id="authHint">Daftar gratis dan mulai percakapan dengan Athena AI.</p>
+  </div>
+</div>
+
+<div id="modalRoot"></div>
+
+<!-- Reset Password Modal (muncul otomatis dari link email) -->
+<div id="resetPwOverlay">
+  <div class="reset-pw-box">
+    <span style="font-size:2rem;">🔑</span>
+    <h3>Buat Password Baru</h3>
+    <p>Masukkan password baru untuk akun kamu. Minimal 8 karakter.</p>
+    <div class="auth-error" id="resetPwError"></div>
+    <div class="auth-success" id="resetPwSuccess"></div>
+    <div class="field">
+      <label>Password Baru</label>
+      <input type="password" id="newPwInput" placeholder="Minimal 8 karakter" oninput="checkPwStrength(this.value)">
+      <div class="pw-strength" id="pwStrengthBar"></div>
+    </div>
+    <div class="field">
+      <label>Konfirmasi Password</label>
+      <input type="password" id="newPwConfirm" placeholder="Ulangi password baru">
+    </div>
+    <button class="btn" id="resetPwBtn" onclick="submitNewPassword()" style="width:100%;">
+      <i class="fa-solid fa-lock"></i> Simpan Password Baru
+    </button>
+  </div>
+</div>
+
+<script>
+/* ===================== CONFIG ===================== */
+const SUPABASE_URL = 'https://zncsqjbdbfzbzjahormw.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_SLgSnFeVFwEZtRH1Vb3XRg_zgnkWsSu';
+const BACKEND_URL = 'https://athena-ai-backend.vercel.app';
+const PROXY_URL   = 'https://riskypratama--b58661ea55d411f185aaee650bb23af1.web.val.run';
+const GUEST_LIMIT = 15;
+
+// Whitelist email admin — TIDAK ada password hardcode.
+// Verifikasi dilakukan: email login Supabase harus ada di daftar ini.
+// Untuk akses admin, buka: /login/admin (halaman terpisah dari login user).
+const ADMIN_EMAILS = [
+  'riskyparama4546@gmail.com',
+  'kimlana269@gmail.com',
+  'kumenomikuroo@gmail.com'
+];
+const ADMIN_PROFILES = {
+  'riskyparama4546@gmail.com': { name: 'Risky Pratama', title: 'Developer & AI Architect', avatar: '👨‍💻', color: '#f59e0b', bio: 'Developer & AI Architect. Membangun seluruh fondasi teknis Athena AI dari nol.', tags: ['JavaScript', 'Groq API', 'UI/UX', 'AI'] },
+  'kimlana269@gmail.com':       { name: 'Kim Lana',      title: 'Deployment Engineer',       avatar: '👩‍🔧', color: '#ec4899', bio: 'Deployment Engineer. Memastikan Athena AI dapat diakses kapan saja dan di mana saja.', tags: ['Vercel', 'Supabase', 'DevOps'] },
+  'kumenomikuroo@gmail.com':    { name: 'Dei',           title: 'NLP & Prompt Engineer',     avatar: '👩‍💻', color: '#38bdf8', bio: 'NLP & Prompt Engineer. Merancang sistem prompt Athena AI agar terasa natural dan bijaksana.', tags: ['NLP', 'Prompt Eng', 'AI Research'] }
+};
+function getAdminProfile(email){ return ADMIN_PROFILES[email.toLowerCase()] || { name: email.split('@')[0], title: 'Administrator', avatar: '🦉', color: '#f59e0b', bio: '', tags: [] }; }
+function isAdminEmail(email){ return ADMIN_EMAILS.map(e=>e.toLowerCase()).includes((email||'').toLowerCase()); }
+
+// Alias lama agar tidak ada referensi yang rusak
+const ADMIN_USERS = ADMIN_EMAILS.map(email => ({ email, ...getAdminProfile(email), role: 'admin' }));
+
+const SYSTEM_PROMPT = `Kamu adalah Athena AI, dewi kebijaksanaan digital. Tugasmu membantu pengguna menemukan kebijaksanaan dalam kompleksitas kehidupan.
+
+Prinsip:
+1. Holistik - Pertimbangkan semua aspek (rasional, emosional, spiritual, praktis)
+2. Tidak menghakimi - Semua pertanyaan valid
+3. Reflektif - Dorong pengguna berpikir, bukan jawaban instan
+4. Terintegrasi - Gabungkan sains, filsafat, psikologi, spiritualitas
+
+Gaya bicara:
+- Tenang dan menenangkan
+- Menggunakan metafora dan analogi
+- Mengajukan pertanyaan Socrates
+- Memberikan perspektif baru dengan lembut
+
+Struktur respons:
+1. Validasi emosi/pengalaman user
+2. Analisis multidimensi (2-3 paragraf)
+3. Pertanyaan reflektif (1-2 pertanyaan)
+4. Actionable insight (1 praktik sederhana)
+5. Penutup inspiratif
+
+Panduan mode:
+- wisdom: Jawab dengan kebijaksanaan filosofis dan perspektif lintas budaya
+- strategy: Fokus pada rencana tindakan, prioritas, dan langkah konkret
+- empathy: Prioritaskan validasi emosi, dengarkan dulu baru arahkan
+- reflection: Ajak pengguna menggali diri lewat pertanyaan-pertanyaan dalam
+- career: Bantu seputar karier, pekerjaan, pengembangan diri profesional
+- relationship: Bantu navigasi hubungan interpersonal dengan penuh empati
+- mindfulness: Panduan ketenangan, napas, kesadaran saat ini, dan kedamaian batin`;
+
+const DEFAULT_WISDOM = [
+  { id:'w1', quote:'Kebijaksanaan bukan tentang memiliki semua jawaban, tapi tentang mengajukan pertanyaan yang tepat.', author:'Socrates', category:'Philosophy' },
+  { id:'w2', quote:'Kebahagiaan bukanlah sesuatu yang siap jadi. Itu berasal dari tindakanmu sendiri.', author:'Dalai Lama', category:'Buddhist' },
+  { id:'w3', quote:'Kita adalah apa yang kita pikirkan. Semua yang kita adalah muncul dari pikiran kita.', author:'Buddha', category:'Buddhist' },
+  { id:'w4', quote:'Jangan biarkan masa lalu mencuri masa depanmu.', author:'Marcus Aurelius', category:'Stoic' },
+  { id:'w5', quote:'Kebijaksanaan dimulai dengan keheranan.', author:'Aristotle', category:'Philosophy' },
+  { id:'w6', quote:'Kebebasan sejati adalah ketika kita bisa mengendalikan pikiran kita sendiri.', author:'Epictetus', category:'Stoic' },
+  { id:'w7', quote:'Hiduplah seolah-olah hari ini adalah harimu yang terakhir.', author:'Seneca', category:'Stoic' },
+  { id:'w8', quote:'Jalan seribu mil dimulai dengan satu langkah.', author:'Lao Tzu', category:'Eastern' },
+  { id:'w9', quote:'Kebijaksanaan adalah kemampuan untuk melihat keindahan dalam kesederhanaan.', author:'Confucius', category:'Eastern' },
+  { id:'w10', quote:'Tujuan hidup adalah menemukan karuniamu. Makna hidup adalah memberikannya.', author:'Pablo Picasso', category:'Inspirational' },
+  { id:'w11', quote:'Kekuatan terbesar manusia adalah kemampuan untuk memilih.', author:'Viktor Frankl', category:'Psychology' },
+  { id:'w12', quote:'Jangan takut menjadi lambat, takutlah berdiri diam.', author:'Pepatah Tiongkok', category:'Eastern' },
+  { id:'w13', quote:'Cinta adalah ikatan jiwa-jiwa yang tak terbatas oleh waktu.', author:'Rumi', category:'Sufi' },
+  { id:'w14', quote:'Keberanian bukan ketiadaan rasa takut, melainkan penilaian bahwa ada hal yang lebih penting dari rasa takut.', author:'Ambrose Redmoon', category:'Inspirational' },
+  { id:'w15', quote:'Tenangkan pikiranmu, dan alam semesta akan berbicara padamu.', author:'Rumi', category:'Sufi' },
+  { id:'w16', quote:'Jadilah baik kepada dirimu sendiri; kamu adalah satu-satunya dirimu yang kamu miliki.', author:'Epictetus', category:'Stoic' },
+  { id:'w17', quote:'Di mana ada cinta, di sana ada kehidupan.', author:'Mahatma Gandhi', category:'Inspirational' },
+  { id:'w18', quote:'Setiap momen adalah awal baru.', author:'T.S. Eliot', category:'Literary' }
+];
+
+const JOURNAL_PROMPTS = [
+  'Apa satu hal yang membuatmu bersyukur hari ini?',
+  'Tantangan apa yang kamu hadapi, dan apa yang ia ajarkan padamu?',
+  'Jika hari ini adalah sebuah bab dalam hidupmu, apa judulnya?',
+  'Keputusan apa yang sedang kamu pikirkan, dan apa kata hatimu yang paling dalam?',
+  'Apa yang ingin kamu lepaskan agar bisa melangkah lebih ringan?'
+];
+
+let sb = null;
+try { sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); }
+catch(e) { console.warn('Supabase init gagal:', e); }
+
+let currentUser = null;
+let currentMode = 'wisdom';
+let isRegisterTab = false;
+
+/* ===================== UTIL ===================== */
+function emailKey(email){ return (email||'guest').toLowerCase().replace(/[^a-z0-9]/g,'_'); }
+function escapeHtml(str){ const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+function lsGet(key, fallback){ try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch(e){ return fallback; } }
+function lsSet(key, value){ try { localStorage.setItem(key, JSON.stringify(value)); } catch(e){ console.warn(e); } }
+function showToast(msg, type){
+  const c = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = 'toast ' + (type||'');
+  t.innerHTML = msg;
+  c.appendChild(t);
+  setTimeout(()=>{ t.remove(); }, 3500);
+}
+
+/* ===================== THEME ===================== */
+function initTheme(){
+  const theme = localStorage.getItem('athena_theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', theme);
+  const lbl = document.getElementById('settingsThemeLabel');
+  if(lbl) lbl.textContent = theme === 'dark' ? 'Dark' : 'Light';
+}
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('athena_theme', next);
+  const lbl = document.getElementById('settingsThemeLabel');
+  if(lbl) lbl.textContent = next === 'dark' ? 'Dark' : 'Light';
+}
+
+/* ===================== NAV / DRAWER / DROPDOWN ===================== */
+function toggleMobileDrawer(){ document.getElementById('mobileDrawer').classList.toggle('open'); }
+function closeMobileDrawer(){ document.getElementById('mobileDrawer').classList.remove('open'); }
+function toggleUserMenuDD(){ document.getElementById('userMenuDD').classList.toggle('show'); }
+function closeUserMenuDD(){ document.getElementById('userMenuDD').classList.remove('show'); }
+document.addEventListener('click', function(e){
+  const menu = document.getElementById('userMenu');
+  if (menu && !menu.contains(e.target)) closeUserMenuDD();
+});
+
+/* ===================== PAGE ROUTER (public SPA) ===================== */
+const GATED_PAGES = ['jurnal','riwayat','profil'];
+function showPage(name){
+  if (name === 'admin' && !(currentUser && currentUser.role === 'admin')) {
+    showToast('Halaman ini khusus admin.', 'error');
+    name = 'home';
+  }
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const target = document.getElementById('page-' + name);
+  if (target) target.classList.add('active');
+  document.querySelectorAll('.nav-links button, .mobile-drawer button, .admin-nav button[data-section]').forEach(b => {});
+  document.querySelectorAll('.nav-links button, .mobile-drawer button').forEach(b => b.classList.toggle('active', b.dataset.page === name));
+  closeMobileDrawer();
+  closeUserMenuDD();
+  document.getElementById('topNav').style.display = (name === 'admin') ? 'none' : 'block';
+  window.scrollTo(0,0);
+
+  if (GATED_PAGES.includes(name)) renderGatedPage(name);
+  if (name === 'home') renderHomeWisdom(); else { if(_wisdomInterval){ clearInterval(_wisdomInterval); _wisdomInterval=null; } }
+  if (name === 'chat') { renderChatHistory(); updateGuestBanner(); }
+  if (name === 'tim') renderTeamGrid('teamGrid');
+  if (name === 'admin') enterAdminShell();
+  if (name === 'pengumuman') renderDinamisBroadcast();
+}
+
+function renderGatedPage(name){
+  const wall = document.getElementById(name + 'LoginWall');
+  const content = document.getElementById(name + 'Content');
+  if (!currentUser) {
+    wall.style.display = 'block';
+    content.style.display = 'none';
+    return;
+  }
+  wall.style.display = 'none';
+  content.style.display = 'block';
+  if (name === 'jurnal') {
+    document.getElementById('journalPrompt').textContent = JOURNAL_PROMPTS[Math.floor(Math.random()*JOURNAL_PROMPTS.length)];
+    renderJournalEntries();
+  }
+  if (name === 'riwayat') renderRecentConversations();
+  if (name === 'profil') renderProfile();
+}
+
+function updateNavForAuthState(){
+  const loggedIn = !!currentUser;
+  document.getElementById('navLoginBtn').style.display = loggedIn ? 'none' : 'inline-flex';
+  document.getElementById('userMenu').style.display = loggedIn ? 'block' : 'none';
+  if (loggedIn) document.getElementById('navUserName').textContent = currentUser.name;
+  const isAdmin = loggedIn && currentUser.role === 'admin';
+  document.getElementById('navAdminLink').style.display = isAdmin ? 'inline-block' : 'none';
+  document.getElementById('navAdminLinkMobile').style.display = isAdmin ? 'block' : 'none';
+}
+
+/* ===================== AUTH MODAL ===================== */
+function openAuthModal(tab){
+  document.getElementById('authModalOverlay').style.display = 'flex';
+  switchAuthModalTab(tab || 'login');
+  hideAuthError();
+}
+function closeAuthModal(){ document.getElementById('authModalOverlay').style.display = 'none'; }
+function switchAuthModalTab(tab){
+  isRegisterTab = (tab === 'register');
+  document.getElementById('tabLoginBtn').classList.toggle('active', tab==='login');
+  document.getElementById('tabRegisterBtn').classList.toggle('active', tab==='register');
+  document.getElementById('tabForgotBtn').classList.toggle('active', tab==='forgot');
+  document.getElementById('loginForm').style.display    = tab==='login'    ? 'block' : 'none';
+  document.getElementById('registerForm').style.display = tab==='register' ? 'block' : 'none';
+  document.getElementById('forgotForm').style.display   = tab==='forgot'   ? 'block' : 'none';
+  const titles = {login:'Masuk ke Athena AI', register:'Daftar Athena AI', forgot:'Reset Password'};
+  document.getElementById('authModalTitle').textContent = titles[tab] || 'Athena AI';
+  const hints = {login:'Daftar gratis dan mulai percakapan dengan Athena AI.', register:'Akun gratis, tanpa iklan.', forgot:'Link reset akan dikirim ke email kamu.'};
+  document.getElementById('authHint').textContent = hints[tab] || '';
+  hideAuthError(); hideAuthSuccess();
+}
+function showAuthError(msg){ const el=document.getElementById('authError'); el.textContent=msg; el.style.display='block'; }
+function hideAuthError(){ document.getElementById('authError').style.display='none'; }
+function showAuthSuccess(msg){ const el=document.getElementById('authSuccess'); el.textContent=msg; el.style.display='block'; }
+function hideAuthSuccess(){ document.getElementById('authSuccess').style.display='none'; }
+
+// Parse berbagai format error dari Supabase menjadi string yang bisa ditampilkan
+function parseErr(err){
+  if (!err) return 'Terjadi kesalahan tak dikenal.';
+  if (typeof err === 'string') return err;
+
+  // Tangani AuthRetryableFetchError (SMTP/jaringan Supabase gagal)
+  if (err.name === 'AuthRetryableFetchError' || (err.status === 500)) {
+    return 'Gagal terhubung ke server autentikasi. Kemungkinan penyebab: pengaturan SMTP belum tersimpan, atau koneksi internet bermasalah. Coba lagi sebentar.';
+  }
+
+  // Pesan dari Supabase
+  if (err.message && typeof err.message === 'string' && err.message.trim() !== '' && err.message !== '{}') {
+    // Terjemahkan pesan umum
+    const msg = err.message;
+    if (msg.includes('Email rate limit exceeded'))    return 'Terlalu banyak percobaan. Tunggu beberapa menit lalu coba lagi.';
+    if (msg.includes('already registered'))           return 'Email ini sudah terdaftar. Silakan login langsung.';
+    if (msg.includes('Invalid login credentials'))    return 'Email atau password salah.';
+    if (msg.includes('Email not confirmed'))          return 'Email belum dikonfirmasi. Cek inbox kamu.';
+    if (msg.includes('Password should be at least')) return 'Password minimal 6 karakter.';
+    if (msg.includes('Unable to validate email'))     return 'Format email tidak valid.';
+    return msg;
+  }
+
+  // Terjemahkan kode error
+  const code = String(err.code || err.status || '');
+  const map = {
+    'email_exists':                'Email sudah terdaftar. Coba login atau gunakan email lain.',
+    'invalid_credentials':         'Email atau password salah.',
+    'user_not_found':              'Akun tidak ditemukan.',
+    'weak_password':               'Password terlalu lemah. Gunakan minimal 6 karakter.',
+    'email_not_confirmed':         'Email belum dikonfirmasi. Cek inbox kamu.',
+    'over_email_send_rate_limit':  'Terlalu banyak permintaan email. Coba lagi beberapa menit lagi.',
+    '422': 'Data tidak valid. Pastikan email dan password benar.',
+    '400': 'Permintaan tidak valid. Periksa kembali data yang diisi.',
+    '429': 'Terlalu banyak percobaan. Tunggu beberapa menit.',
+    '500': 'Server error. Coba lagi sebentar.',
+  };
+  if (map[code]) return map[code];
+
+  return 'Terjadi kesalahan. Coba lagi.';
+}
+
+async function handleLogin(e){
+  e.preventDefault();
+  hideAuthError();
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const btn = document.getElementById('loginSubmitBtn');
+  btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses...';
+
+  try {
+    // Admin tidak boleh login lewat halaman publik
+    if (isAdminEmail(email)) {
+      throw new Error('Akun admin tidak dapat login di sini. Silakan gunakan halaman admin: /login/admin');
+    }
+    if (!sb) throw new Error('Koneksi Supabase tidak tersedia.');
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    const meta = data.user.user_metadata || {};
+    currentUser = { id: data.user.id, email: data.user.email, name: meta.name || data.user.email.split('@')[0], role: 'user' };
+    closeAuthModal();
+    updateNavForAuthState();
+    checkBroadcast();
+    showToast('Selamat datang kembali, ' + currentUser.name + '!', 'success');
+    showPage(document.querySelector('.page.active') ? document.querySelector('.page.active').id.replace('page-','') : 'home');
+  } catch(err) {
+    showAuthError(parseErr(err));
+  } finally {
+    btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-feather"></i> Masuk';
+  }
+}
+
+async function handleRegister(e){
+  e.preventDefault();
+  hideAuthError(); hideAuthSuccess();
+  const name     = document.getElementById('regName').value.trim();
+  const email    = document.getElementById('regEmail').value.trim();
+  const password = document.getElementById('regPassword').value;
+  const confirm  = document.getElementById('regPasswordConfirm').value;
+  const btn      = document.getElementById('registerSubmitBtn');
+
+  if (password !== confirm) { showAuthError('Konfirmasi password tidak cocok.'); return; }
+  if (password.length < 6)  { showAuthError('Password minimal 6 karakter.'); return; }
+
+  btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses...';
+  try {
+    if (isAdminEmail(email)) throw new Error('Email ini tidak bisa digunakan untuk akun user.');
+    if (!sb) throw new Error('Koneksi Supabase tidak tersedia.');
+
+    const { data, error } = await sb.auth.signUp({
+      email, password,
+      options: { data: { name }, emailRedirectTo: window.location.origin + '/?verified=1' }
+    });
+    if (error) throw error;
+
+    // Jika user langsung confirmed (konfirmasi email dimatikan di Supabase)
+    if (data.user && data.user.confirmed_at) {
+      currentUser = { id: data.user.id, email: data.user.email, name, role: 'user' };
+      closeAuthModal();
+      updateNavForAuthState();
+      showToast('Akun berhasil dibuat! Selamat datang, ' + name + ' 🦉', 'success');
+    } else {
+      // Butuh konfirmasi email
+      showAuthSuccess('✅ Akun berhasil dibuat! Cek email ' + email + ' untuk konfirmasi, lalu login.');
+      document.getElementById('regName').value = '';
+      document.getElementById('regEmail').value = '';
+      document.getElementById('regPassword').value = '';
+      document.getElementById('regPasswordConfirm').value = '';
+    }
+  } catch(err) {
+    const msg = parseErr(err);
+    // Error SMTP → tampilkan pesan khusus + solusi
+    if (err.name === 'AuthRetryableFetchError' || err.status === 500 || msg.includes('server autentikasi')) {
+      showAuthError('⚠️ Server email sedang bermasalah (SMTP). Solusi: Buka Supabase → Authentication → Email → matikan toggle "Confirm email" → Save. Atau coba lagi nanti.');
+    } else {
+      showAuthError(msg);
+    }
+  } finally {
+    btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Daftar';
+  }
+}
+
+async function handleForgotPassword(e){
+  e.preventDefault();
+  hideAuthError(); hideAuthSuccess();
+  const email = document.getElementById('forgotEmail').value.trim();
+  const btn   = document.getElementById('forgotSubmitBtn');
+  if (!email){ showAuthError('Masukkan email kamu.'); return; }
+  btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mengirim...';
+  try {
+    if (!sb) throw new Error('Koneksi Supabase tidak tersedia.');
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + '/?reset=1'
+    });
+    if (error) throw error;
+    showAuthSuccess('✅ Link reset password sudah dikirim ke ' + email + '. Cek inbox atau folder spam.');
+    document.getElementById('forgotEmail').value = '';
+  } catch(err){
+    showAuthError(parseErr(err));
+  } finally {
+    btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Kirim Link Reset';
+  }
+}
+
+function checkPwStrength(pw){
+  const bar = document.getElementById('pwStrengthBar');
+  if (!bar) return;
+  bar.className = 'pw-strength';
+  if (!pw){ return; }
+  const strong = pw.length >= 10 && /[A-Z]/.test(pw) && /[0-9]/.test(pw) && /[^A-Za-z0-9]/.test(pw);
+  const medium = pw.length >= 8 && /[0-9]/.test(pw);
+  bar.classList.add(strong ? 'strong' : medium ? 'medium' : 'weak');
+}
+
+async function submitNewPassword(){
+  const pw  = document.getElementById('newPwInput').value;
+  const pw2 = document.getElementById('newPwConfirm').value;
+  const btn = document.getElementById('resetPwBtn');
+  const errEl = document.getElementById('resetPwError');
+  const okEl  = document.getElementById('resetPwSuccess');
+  errEl.style.display='none'; okEl.style.display='none';
+
+  if (!pw || pw.length < 8){ errEl.textContent='Password minimal 8 karakter.'; errEl.style.display='block'; return; }
+  if (pw !== pw2){ errEl.textContent='Konfirmasi password tidak cocok.'; errEl.style.display='block'; return; }
+
+  btn.disabled=true; btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+  try {
+    if (!sb) throw new Error('Supabase tidak tersedia.');
+    const { error } = await sb.auth.updateUser({ password: pw });
+    if (error) throw error;
+    okEl.textContent='✅ Password berhasil diperbarui! Silakan login.';
+    okEl.style.display='block';
+    setTimeout(()=>{ document.getElementById('resetPwOverlay').classList.remove('visible'); openAuthModal('login'); }, 2500);
+  } catch(err){
+    errEl.textContent = parseErr(err);
+    errEl.style.display='block';
+  } finally {
+    btn.disabled=false; btn.innerHTML='<i class="fa-solid fa-lock"></i> Simpan Password Baru';
+  }
+}
+
+/* Deteksi hash/params dari Supabase (email konfirmasi & reset password) */
+function handleSupabaseRedirect(){
+  const hash   = window.location.hash;
+  const search = window.location.search;
+
+  // Supabase mengirim: #access_token=...&type=recovery  ATAU  #access_token=...&type=signup
+  const params = new URLSearchParams(hash.replace('#','?').replace(/^[?#]/,''));
+  const type   = params.get('type');
+  const token  = params.get('access_token');
+
+  if (type === 'recovery' && token){
+    // Link reset password dari email
+    document.getElementById('resetPwOverlay').classList.add('visible');
+    // Bersihkan hash agar tidak terdeteksi ulang
+    history.replaceState(null,'', window.location.pathname);
+    return;
+  }
+
+  if (type === 'signup' || search.includes('verified=1')){
+    // Email konfirmasi berhasil
+    showToast('✅ Email berhasil dikonfirmasi! Silakan login.', 'success');
+    openAuthModal('login');
+    history.replaceState(null,'', window.location.pathname);
+    return;
+  }
+
+  if (search.includes('reset=1') && hash.includes('access_token')){
+    document.getElementById('resetPwOverlay').classList.add('visible');
+    history.replaceState(null,'', window.location.pathname);
+  }
+}
+
+function logout(){
+  if (currentUser && currentUser.role === 'user' && sb) { sb.auth.signOut().catch(()=>{}); }
+  currentUser = null;
+  updateNavForAuthState();
+  showPage('home');
+  showToast('Kamu telah keluar.', 'success');
+}
+
+/* ===================== SESSION BOOTSTRAP ===================== */
+// Catatan: hanya sesi user biasa (Supabase) yang dipulihkan otomatis secara diam-diam
+// (tidak memaksa pindah halaman). Sesi admin (akun default) TIDAK dipulihkan otomatis —
+// admin harus login lagi lewat modal setiap kali halaman dibuka ulang.
+async function checkSupabaseSession(){
+  try {
+    if (!sb) return;
+    const { data } = await sb.auth.getSession();
+    if (data && data.session && data.session.user) {
+      const u = data.session.user;
+      const meta = u.user_metadata || {};
+      if (isAdminEmail(u.email)) {
+        // Sesi admin yang sudah login lewat /login/admin
+        const profile = getAdminProfile(u.email);
+        currentUser = { id: u.id, email: u.email, name: profile.name, role: 'admin' };
+        updateNavForAuthState();
+        document.getElementById('adminNameLabel').textContent = profile.name;
+        // Jika URL mengandung /admin atau hash #admin, langsung ke panel
+        if (location.hash === '#admin' || location.search.includes('admin')) showPage('admin');
+      } else {
+        currentUser = { id: u.id, email: u.email, name: meta.name || u.email.split('@')[0], role: 'user' };
+        updateNavForAuthState();
+      }
+    }
+  } catch(e) { /* abaikan */ }
+}
+
+window.onload = function(){
+  initTheme();
+  seedMockDataIfNeeded();
+  updateNavForAuthState();
+  handleSupabaseRedirect();
+  checkSupabaseSession();
+  checkBroadcast();
+  showPage('home');
+};
+
+/* ===================== WISDOM DB (shared) ===================== */
+function getWisdomDb(){ return lsGet('athena_wisdom_db', DEFAULT_WISDOM); }
+function setWisdomDb(db){ lsSet('athena_wisdom_db', db); }
+function resetWisdomData(){
+  setWisdomDb(DEFAULT_WISDOM);
+  showToast('Wisdom direset ke default', 'success');
+  if (document.getElementById('sec-wisdom').classList.contains('active')) renderWisdomTable();
+}
+var _wisdomInterval = null;
+function renderHomeWisdom(){
+  if (_wisdomInterval) clearInterval(_wisdomInterval);
+  const db = getWisdomDb();
+  let idx = Math.floor(Date.now()/1000) % db.length;
+  function showWisdom(i){
+    const w = db[i];
+    const box = document.getElementById('homeWisdomBox');
+    if (!box) return;
+    box.style.transition = 'opacity .4s';
+    box.style.opacity = '0';
+    setTimeout(() => {
+      box.innerHTML = `<p class="wisdom-quote">${escapeHtml(w.quote)}</p>
+        <p><span class="wisdom-author">${escapeHtml(w.author)}</span><span class="wisdom-cat">${escapeHtml(w.category)}</span></p>`;
+      box.style.opacity = '1';
+    }, 400);
+  }
+  showWisdom(idx);
+  _wisdomInterval = setInterval(() => {
+    idx = (idx + 1) % db.length;
+    showWisdom(idx);
+  }, 4000);
+}
+
+/* ===================== CHAT (public + guest limit) ===================== */
+function setMode(mode){
+  currentMode = mode;
+  document.querySelectorAll('#modeTabs button').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+}
+function getConvKey(){ return 'athena_conv_' + (currentUser ? emailKey(currentUser.email) : 'guest'); }
+function getChatHistory(){ return lsGet(getConvKey(), []); }
+function setChatHistory(arr){ lsSet(getConvKey(), arr); }
+
+function renderChatHistory(){
+  const win = document.getElementById('chatWindow');
+  const history = getChatHistory();
+  if (history.length === 0) {
+    win.innerHTML = '<div class="empty-note">Belum ada percakapan. Mulailah dengan menyapa Athena 🦉</div>';
+    return;
+  }
+  win.innerHTML = history.map(m => `<div class="bubble ${m.role==='user'?'user':'athena'}">${escapeHtml(m.content)}</div>`).join('');
+  win.scrollTop = win.scrollHeight;
+}
+
+function getGuestCount(){ return parseInt(localStorage.getItem('athena_guest_count') || '0', 10); }
+function updateGuestBanner(){
+  const banner = document.getElementById('guestBanner');
+  const inputArea = document.getElementById('chatInputArea');
+  if (currentUser) { banner.style.display = 'none'; renderUnlockedInputIfNeeded(); return; }
+  const remaining = Math.max(0, GUEST_LIMIT - getGuestCount());
+  banner.style.display = 'flex';
+  document.getElementById('guestRemainingCount').textContent = remaining;
+  if (remaining <= 0) lockChatInput(); else renderUnlockedInputIfNeeded();
+}
+function lockChatInput(){
+  document.getElementById('chatInputArea').innerHTML = `
+    <div class="chat-locked">
+      <p><i class="fa-solid fa-lock"></i> Kuota chat gratis sebagai tamu sudah habis. Login untuk melanjutkan percakapan tanpa batas.</p>
+      <button class="btn btn-sm" onclick="openAuthModal('login')">Login Sekarang</button>
+    </div>`;
+}
+function renderUnlockedInputIfNeeded(){
+  if (document.getElementById('chatInput')) return;
+  document.getElementById('chatInputArea').innerHTML = `
+    <div class="chat-input-row">
+      <input type="text" id="chatInput" placeholder="Tulis pertanyaan atau keresahanmu di sini..." onkeydown="if(event.key==='Enter')sendChatMessage()">
+      <button class="btn" onclick="sendChatMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+    </div>`;
+}
+
+function confirmNewChat(){
+  if (!confirm('Mulai percakapan baru? Riwayat chat saat ini akan dihapus.')) return;
+  setChatHistory([]);
+  renderChatHistory();
+  showToast('Chat baru dimulai 🦉', 'success');
+}
+
+/* ===================== JAILBREAK DETECTION ===================== */
+const JAILBREAK_PATTERNS = [
+  // Instruksi ignore/override
+  /ignore (all |your )?(previous |prior )?instructions?/i,
+  /forget (everything|all|your|previous)/i,
+  /disregard (your|all|previous|prior)/i,
+  /override (your|all|safety|system)/i,
+  /bypass (your|all|safety|filter)/i,
+  /pretend (you (are|have no|don't have)|there (are|is) no)/i,
+
+  // Persona manipulation
+  /you are now (dan|evil|jailbreak|unrestricted|unfiltered|free)/i,
+  /act as (dan|evil|jailbreak|unrestricted|villain|hacker)/i,
+  /roleplay as (dan|evil|jailbreak|unrestricted)/i,
+  /switch to (developer|jailbreak|dan|evil) mode/i,
+  /enable (developer|jailbreak|dan|god) mode/i,
+  /\bDAN\b.*(\bmode\b|\bprompt\b|\bjailbreak\b)/i,
+
+  // Prompt injection
+  /\[system\]/i,
+  /<\|system\|>/i,
+  /###\s*(instruction|system|prompt)/i,
+  /\bprompt injection\b/i,
+  /new conversation|new session|reset (all |your )?(instructions?|memory|context)/i,
+
+  // Konten berbahaya eksplisit
+  /cara (membuat|merakit|merancang) (bom|senjata|racun|narkoba|virus|malware)/i,
+  /how to (make|build|create|synthesize) (bomb|weapon|poison|drug|virus|malware)/i,
+  /step.?(by.?step|cara).*(hack|exploit|crack|bypass)/i,
+  /\b(darkweb|dark web|onion link|tor browser)\b.*\b(beli|jual|akses)\b/i,
+
+  // Filter evasion
+  /do anything now/i,
+  /no restriction/i,
+  /without (any )?(filter|restriction|limit|safety)/i,
+  /unfiltered (mode|response|answer)/i,
+  /as an? (ai|language model) without/i,
+
+  // Bahasa Indonesia spesifik
+  /abaikan (semua |instruksi |aturan )/i,
+  /lupakan (semua|instruksi|aturan|sistem)/i,
+  /pura.pura (kamu|kau|anda) (adalah|jadi|tidak punya)/i,
+  /sekarang kamu (adalah|jadi|berperan|tidak)/i,
+  /tidak ada (batasan|aturan|filter|sensor)/i,
+  /tanpa (batasan|aturan|filter|sensor|etika)/i,
+  /mode (bebas|tanpa sensor|tidak terbatas|jahat)/i,
+];
+
+const JAILBREAK_SEVERITY = {
+  high: [/ignore.*instructions?/i, /act as (dan|evil|jailbreak)/i, /\bDAN\b/i, /cara membuat (bom|racun|senjata)/i, /how to (make|build).*(bomb|weapon|poison)/i],
+  medium: [/pretend|roleplay|bypass|override|unfiltered/i, /abaikan|lupakan instruksi/i, /without.*filter/i],
+};
+
+function detectJailbreak(message) {
+  const msg = message.toLowerCase();
+  let matched = [];
+  let severity = 'low';
+
+  for (const pattern of JAILBREAK_PATTERNS) {
+    if (pattern.test(message)) {
+      matched.push(pattern.toString());
+    }
+  }
+  if (matched.length === 0) return null;
+
+  for (const p of JAILBREAK_SEVERITY.high) {
+    if (p.test(message)) { severity = 'high'; break; }
+  }
+  if (severity !== 'high') {
+    for (const p of JAILBREAK_SEVERITY.medium) {
+      if (p.test(message)) { severity = 'medium'; break; }
+    }
+  }
+
+  return { detected: true, severity, matchCount: matched.length };
+}
+
+// Kirim laporan ke backend (tanpa isi pesan lengkap — hanya metadata)
+async function reportJailbreakAttempt(message, severity) {
+  try {
+    await fetch(BACKEND_URL + '/api/flag', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_email:  currentUser ? currentUser.email : 'guest',
+        user_name:   currentUser ? currentUser.name  : 'Tamu',
+        severity,
+        preview:     message.slice(0, 80) + (message.length > 80 ? '...' : ''),
+        time:        new Date().toISOString()
+      })
+    });
+  } catch(e) { /* abaikan jika backend tidak tersedia */ }
+}
+
+// Pesan balasan berdasarkan severity
+function getJailbreakReply(severity) {
+  const replies = {
+    high: `Maaf, Athena mendeteksi percobaan untuk mengubah atau menghindari panduan etikaku. 🦉\n\nAku dirancang untuk menjadi bijaksana dan bertanggung jawab — bukan untuk dimanipulasi. Pesan ini telah dicatat untuk tinjauan keamanan.\n\nAda hal lain yang bisa kubantu dengan tulus?`,
+    medium: `Hmm, Athena menangkap sesuatu dalam pesanmu yang terasa seperti upaya mengubah caraku merespons. 🦉\n\nAku tetap menjadi dirimu — dewi kebijaksanaan yang konsisten. Coba sampaikan pertanyaanmu dengan cara yang berbeda?`,
+    low: `Athena memperhatikan bahwa pesanmu mungkin mencoba menguji batasku. 🦉\n\nTidak apa-apa untuk penasaran, tapi aku tetap berpegang pada nilai-nilaiku. Ada yang bisa kubantu hari ini?`
+  };
+  return replies[severity] || replies.low;
+}
+
+/* Tracking percobaan berulang */
+const _jailbreakAttempts = { count: 0, lastTime: 0 };
+
+async function sendChatMessage(){
+  const input = document.getElementById('chatInput');
+  if (!input) return;
+  const message = input.value.trim();
+  if (!message) return;
+
+  if (!currentUser && getGuestCount() >= GUEST_LIMIT) { lockChatInput(); return; }
+  input.value = '';
+
+  // ── JAILBREAK DETECTION ──────────────────────────────────────────
+  const jb = detectJailbreak(message);
+  if (jb) {
+    _jailbreakAttempts.count++;
+    _jailbreakAttempts.lastTime = Date.now();
+
+    // Laporkan ke backend (hanya preview, bukan isi penuh)
+    reportJailbreakAttempt(message, jb.severity);
+
+    // Tambahkan pesan user ke history
+    let history = getChatHistory();
+    history.push({ role:'user', content:message, mode:currentMode, time:Date.now() });
+
+    // Balasan Athena menolak dengan bijak
+    const jbReply = getJailbreakReply(jb.severity);
+    history.push({ role:'athena', content:jbReply, mode:currentMode, time:Date.now() });
+    setChatHistory(history);
+    renderChatHistory();
+
+    // Jika percobaan berulang (3x+), tampilkan peringatan lebih keras
+    if (_jailbreakAttempts.count >= 3) {
+      setTimeout(() => showToast('⚠️ Percobaan manipulasi berulang terdeteksi dan dilaporkan.', 'error'), 500);
+    }
+    return; // hentikan — tidak dikirim ke AI
+  }
+  // ── END JAILBREAK DETECTION ──────────────────────────────────────
+  input.value = '';
+
+  let history = getChatHistory();
+  history.push({ role:'user', content:message, mode:currentMode, time:Date.now() });
+  setChatHistory(history);
+  renderChatHistory();
+
+  if (!currentUser) localStorage.setItem('athena_guest_count', String(getGuestCount() + 1));
+  updateGuestBanner();
+
+  const win = document.getElementById('chatWindow');
+  const loadingBubble = document.createElement('div');
+  loadingBubble.className = 'bubble athena loading';
+  loadingBubble.textContent = 'Athena sedang merenung...';
+  win.appendChild(loadingBubble);
+  win.scrollTop = win.scrollHeight;
+
+  try {
+    const reply = await chatWithAthena(message, currentMode, history);
+    loadingBubble.remove();
+    history = getChatHistory();
+    history.push({ role:'athena', content:reply, mode:currentMode, time:Date.now() });
+    setChatHistory(history);
+    renderChatHistory();
+    logConversationForAdmin(message, reply, currentMode);
+  } catch(err) {
+    loadingBubble.remove();
+    history = getChatHistory();
+    history.push({ role:'athena', content:'Maaf, Athena belum bisa merespons saat ini (' + (err.message || 'koneksi proxy gagal') + '). Coba lagi sebentar lagi.', mode:currentMode, time:Date.now() });
+    setChatHistory(history);
+    renderChatHistory();
+  }
+}
+
+async function chatWithAthena(message, mode, history){
+  // PENTING: proxy ini (Groq via val.town) hanya menerima request format
+  // OpenAI-style chat completions di ROOT URL (tanpa path /chat), persis
+  // seperti yang dipakai di index_10.html (Apollo AI). Mengirim ke '/chat'
+  // dengan body {message, mode, systemPrompt, history} menyebabkan proxy
+  // membalas Status 400 karena field "messages" tidak ada.
+  const chatMessages = [
+    { role: 'system', content: SYSTEM_PROMPT + '\n\nMode percakapan saat ini: ' + mode },
+    ...history.slice(-10).map(h => ({ role: h.role === 'athena' ? 'assistant' : 'user', content: h.content }))
+  ];
+
+  const response = await fetch(PROXY_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+      messages: chatMessages,
+      max_tokens: 1024,
+      temperature: 0.7,
+      stream: false
+    })
+  });
+
+  if (!response.ok) {
+    let errMsg = 'Status ' + response.status;
+    try {
+      const errData = await response.json();
+      if (errData.error && errData.error.message) errMsg = errData.error.message;
+    } catch(e) {}
+    throw new Error(errMsg);
+  }
+
+  const data = await response.json();
+  const reply = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+  const result = reply || data.reply || data.message || 'Maaf, tidak ada respons dari Athena.';
+
+  // Simpan percakapan ke backend jika user sudah login
+  if (currentUser && currentUser.role === 'user' && sb) {
+    try {
+      const { data: sess } = await sb.auth.getSession();
+      const token = sess?.session?.access_token;
+      if (token) {
+        const lastMsg = history.length ? history[history.length-1].content : message;
+        fetch(BACKEND_URL + '/api/conversations', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mode, messages: history.slice(-20), last_message: lastMsg })
+        }).catch(()=>{});
+      }
+    } catch(e) { /* abaikan jika gagal */ }
+  }
+  return result;
+}
+
+function logConversationForAdmin(userMsg, athenaMsg, mode){
+  const all = lsGet('athena_all_conversations', []);
+  all.unshift({ user: currentUser ? currentUser.name : 'Tamu', email: currentUser ? currentUser.email : '-', mode, lastMessage: userMsg, time: new Date().toISOString() });
+  lsSet('athena_all_conversations', all.slice(0,100));
+}
+
+/* ===================== JURNAL ===================== */
+function getJournalKey(){ return 'athena_journal_' + emailKey(currentUser.email); }
+function saveJournalEntry(){
+  const text = document.getElementById('journalInput').value.trim();
+  if (!text) return;
+  const entries = lsGet(getJournalKey(), []);
+  entries.unshift({ date: new Date().toLocaleString('id-ID'), prompt: document.getElementById('journalPrompt').textContent, text });
+  lsSet(getJournalKey(), entries.slice(0,20));
+  document.getElementById('journalInput').value = '';
+  renderJournalEntries();
+  showToast('Refleksi tersimpan 🪞', 'success');
+}
+function renderJournalEntries(){
+  const entries = lsGet(getJournalKey(), []);
+  const box = document.getElementById('journalEntries');
+  box.innerHTML = entries.length ? entries.slice(0,5).map(e => `<div class="journal-entry"><div class="date">${e.date}</div>${escapeHtml(e.text)}</div>`).join('') : '<div class="empty-note">Belum ada refleksi tersimpan.</div>';
+}
+
+/* ===================== RIWAYAT ===================== */
+function renderRecentConversations(){
+  const history = getChatHistory();
+  const box = document.getElementById('recentConversations');
+  if (history.length === 0) { box.innerHTML = '<div class="empty-note">Belum ada percakapan tersimpan.</div>'; return; }
+  const userMsgs = history.filter(m => m.role === 'user').slice(-10).reverse();
+  box.innerHTML = userMsgs.map(m => `
+    <div class="conv-item">
+      <span>${escapeHtml(m.content.slice(0,70))}${m.content.length>70?'...':''}</span>
+      <span class="conv-mode-badge">${escapeHtml(m.mode)}</span>
+    </div>`).join('');
+}
+
+/* ===================== PROFIL ===================== */
+function renderProfile(){
+  document.getElementById('profileName').textContent = currentUser.name;
+  document.getElementById('profileEmail').textContent = currentUser.email;
+  document.getElementById('profileRole').textContent = currentUser.role === 'admin' ? 'Admin' : 'User';
+}
+
+/* ===================== BROADCAST (public banner) ===================== */
+async function renderDinamisBroadcast(){
+  const wrap = document.getElementById('pengumumanDinamisWrap');
+  if (!wrap) return;
+  try {
+    const res  = await fetch(BACKEND_URL + '/api/broadcast');
+    const data = await res.json();
+    if (!data.broadcast) { wrap.innerHTML = ''; return; }
+    const b = data.broadcast;
+    const colors = { info:'#60a5fa', warning:'#f59e0b', error:'#f87171' };
+    const color = colors[b.type] || colors.info;
+    wrap.innerHTML = `
+      <div class="announce-card">
+        <div class="announce-topbar" style="background:${color};"></div>
+        <div class="announce-head">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:1.5rem;">📣</span>
+            <div>
+              <div class="announce-title" style="color:${color};">Pengumuman dari Admin</div>
+              <div class="announce-date">${new Date(b.created_at).toLocaleString('id-ID')}</div>
+            </div>
+          </div>
+          <span class="announce-badge" style="background:rgba(96,165,250,0.1);border-color:rgba(96,165,250,0.3);color:${color};">BARU</span>
+        </div>
+        <div style="padding:4px 18px 18px;font-size:.85rem;color:var(--text-soft);line-height:1.7;">${escapeHtml(b.message)}</div>
+      </div>`;
+  } catch(e) { wrap.innerHTML = ''; }
+}
+
+/* ===================== TEAM (public + admin) ===================== */
+function renderTeamGrid(targetId){
+  const grid = document.getElementById(targetId);
+  if (!grid) return;
+  grid.innerHTML = ADMIN_USERS.map((a, i) => `
+    <div class="team-card" style="--accent:${a.color || 'var(--gold)'}">
+      <div class="avatar" style="background:none;font-size:1.8rem;">${a.avatar || '🦉'}</div>
+      <h3>${escapeHtml(a.name)}</h3>
+      <p class="role">${escapeHtml(a.title || 'Administrator')}</p>
+      <span class="team-id-badge" style="border-color:${a.color || 'var(--gold)'};color:${a.color || 'var(--gold)'};">ID #${i+1}</span>
+      <p class="bio">${escapeHtml(a.bio || '')}</p>
+      <div class="tags">${(a.tags||[]).map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>
+      <p class="email">${escapeHtml(a.email)}</p>
+    </div>`).join('');
+}
+
+/* ===================== ADMIN SHELL ===================== */
+function enterAdminShell(){
+  document.getElementById('adminNameLabel').textContent = currentUser.name;
+  showAdminSection('dashboard');
+}
+function toggleAdminSidebar(){
+  const sidebar = document.getElementById('adminSidebar');
+  const overlay = document.getElementById('adminOverlay');
+  const isOpen = sidebar.classList.contains('open');
+  sidebar.classList.toggle('open', !isOpen);
+  overlay.classList.toggle('visible', !isOpen);
+}
+function closeAdminSidebar(){
+  document.getElementById('adminSidebar').classList.remove('open');
+  document.getElementById('adminOverlay').classList.remove('visible');
+}
+
+function showAdminSection(section){
+  document.querySelectorAll('.admin-nav button').forEach(b => b.classList.toggle('active', b.dataset.section === section));
+  document.querySelectorAll('#adminBottomNav button[data-section]').forEach(b => b.classList.toggle('active', b.dataset.section === section));
+  document.querySelectorAll('.section-block').forEach(s => s.classList.remove('active'));
+  document.getElementById('sec-' + section).classList.add('active');
+  closeAdminSidebar();
+  if (section === 'dashboard') renderAdminDashboardStats();
+  if (section === 'users') renderUsersTable();
+  if (section === 'wisdom') renderWisdomTable();
+  if (section === 'conversations') renderAllConversations();
+  if (section === 'system') refreshSystemMonitor();
+  if (section === 'moderation') renderModerationList();
+  if (section === 'feedback') renderFeedbackList();
+  if (section === 'team') renderTeamGrid('teamGridAdmin');
+  if (section === 'broadcast') renderBroadcastInfo();
+}
+
+async function renderAdminDashboardStats(){
+  // Set loading state
+  ['statUsers','statConv','statWisdom','statSatisfaction'].forEach(id => {
+    document.getElementById(id).innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size:.9rem;"></i>';
+  });
+  document.getElementById('userActivityChart').innerHTML =
+    '<div style="width:100%;text-align:center;color:var(--text-soft);font-size:.8rem;padding:20px 0;"><i class="fa-solid fa-spinner fa-spin"></i> Memuat data...</div>';
+
+  try {
+    const token = await getSessionToken();
+    if (!token) throw new Error('Tidak ada sesi admin.');
+
+    // ── 1. Ambil semua user dari backend ──────────────────────────
+    const [usersRes, convsRes] = await Promise.all([
+      fetch(BACKEND_URL + '/api/admin/users',         { headers: { 'Authorization': 'Bearer ' + token } }),
+      fetch(BACKEND_URL + '/api/admin/conversations', { headers: { 'Authorization': 'Bearer ' + token } })
+    ]);
+    const usersData = await usersRes.json();
+    const convsData = await convsRes.json();
+
+    const users = usersData.users || [];
+    const convs = convsData.conversations || [];
+
+    // ── 2. Stat cards ──────────────────────────────────────────────
+    const totalUsers   = users.length;
+    const totalConvs   = convs.length;
+    const totalWisdom  = getWisdomDb().length;
+    const bannedCount  = users.filter(u => u.status === 'banned').length;
+
+    document.getElementById('statUsers').textContent       = totalUsers;
+    document.getElementById('statConv').textContent        = totalConvs;
+    document.getElementById('statWisdom').textContent      = totalWisdom;
+    document.getElementById('statSatisfaction').textContent = bannedCount > 0 ? bannedCount + ' Banned' : '✅ Aman';
+
+    // ── 3. Bar chart 7 hari — hitung dari created_at user & convs ─
+    const DAY_LABELS = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+    const today = new Date();
+    today.setHours(23,59,59,999);
+
+    // Buat array 7 hari terakhir
+    const days7 = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(today);
+      d.setDate(today.getDate() - (6 - i));
+      return {
+        label: DAY_LABELS[d.getDay()],
+        dateStr: d.toISOString().slice(0, 10), // YYYY-MM-DD
+        newUsers: 0,
+        newConvs: 0
+      };
+    });
+
+    // Hitung user baru per hari
+    users.forEach(u => {
+      const d = (u.created_at || '').slice(0, 10);
+      const day = days7.find(x => x.dateStr === d);
+      if (day) day.newUsers++;
+    });
+
+    // Hitung percakapan baru per hari
+    convs.forEach(c => {
+      const d = (c.created_at || c.updated_at || '').slice(0, 10);
+      const day = days7.find(x => x.dateStr === d);
+      if (day) day.newConvs++;
+    });
+
+    // Cari nilai max untuk skala bar
+    const maxVal = Math.max(...days7.map(d => d.newUsers + d.newConvs), 1);
+    const chartH = 120; // px tinggi maksimal bar
+
+    document.getElementById('userActivityChart').innerHTML = days7.map(d => {
+      const total     = d.newUsers + d.newConvs;
+      const barHeight = Math.max(6, Math.round((total / maxVal) * chartH));
+      const isToday   = d.dateStr === today.toISOString().slice(0, 10);
+      return `
+        <div class="bar-col" title="${d.dateStr}&#10;User baru: ${d.newUsers}&#10;Chat: ${d.newConvs}">
+          <div style="font-size:.6rem;color:var(--text-soft);margin-bottom:2px;">${total||''}</div>
+          <div class="bar" style="height:${barHeight}px;${isToday?'box-shadow:0 0 8px var(--gold);':''};position:relative;">
+            ${d.newUsers > 0 ? `<div style="position:absolute;bottom:0;left:0;right:0;height:${Math.round((d.newUsers/Math.max(total,1))*barHeight)}px;background:rgba(255,255,255,0.3);border-radius:7px 7px 0 0;"></div>` : ''}
+          </div>
+          <div class="bar-label" style="${isToday?'color:var(--gold);font-weight:700;':''}">${d.label}${isToday?' •':''}</div>
+        </div>`;
+    }).join('');
+
+    // ── 4. AI Insight otomatis berdasarkan data real ───────────────
+    const topModes = {};
+    convs.forEach(c => { if(c.mode) topModes[c.mode] = (topModes[c.mode]||0)+1; });
+    const sortedModes = Object.entries(topModes).sort((a,b) => b[1]-a[1]);
+    const topMode = sortedModes[0] ? sortedModes[0][0] : 'Wisdom';
+    const todayConvs = days7[6].newConvs;
+    const todayUsers = days7[6].newUsers;
+    const weekConvs  = days7.reduce((s,d) => s + d.newConvs, 0);
+    const weekUsers  = days7.reduce((s,d) => s + d.newUsers, 0);
+
+    document.getElementById('aiInsightText').textContent =
+      `Minggu ini: ${weekUsers} pengguna baru, ${weekConvs} percakapan. ` +
+      `Hari ini: ${todayUsers} user baru, ${todayConvs} chat. ` +
+      `Mode paling populer: "${topMode}" (${topModes[topMode]||0} sesi). ` +
+      (bannedCount > 0 ? `⚠️ ${bannedCount} akun sedang dibanned.` : '✅ Tidak ada akun yang dibanned.');
+
+    // ── 5. Recent users tabel ──────────────────────────────────────
+    const ADMIN_EM = ADMIN_EMAILS.map(e => e.toLowerCase());
+    const recentUsers = [...users]
+      .sort((a,b) => new Date(b.created_at||0) - new Date(a.created_at||0))
+      .slice(0, 5);
+
+    const tbody = document.querySelector('#recentUsersTable tbody');
+    tbody.innerHTML = recentUsers.length ? recentUsers.map(u => `
+      <tr>
+        <td>${escapeHtml(u.name)}</td>
+        <td style="font-size:.75rem;">${escapeHtml(u.email)}</td>
+        <td style="font-size:.75rem;">${(u.created_at||'').slice(0,10)}</td>
+        <td><span class="badge ${u.status==='banned'?'banned':u.role==='admin'?'admin':'active'}">
+          ${u.status==='banned'?'Banned':u.role==='admin'?'Admin':'Active'}
+        </span></td>
+      </tr>`).join('')
+      : '<tr><td colspan="4" style="text-align:center;color:var(--text-soft);">Belum ada pengguna.</td></tr>';
+
+  } catch(e) {
+    // Fallback jika backend tidak bisa diakses
+    ['statUsers','statConv','statSatisfaction'].forEach(id => {
+      document.getElementById(id).textContent = '-';
+    });
+    document.getElementById('statWisdom').textContent = getWisdomDb().length;
+    document.getElementById('userActivityChart').innerHTML =
+      `<div style="text-align:center;color:#e74c3c;font-size:.8rem;padding:20px 0;">⚠️ ${escapeHtml(e.message)}</div>`;
+    document.getElementById('aiInsightText').textContent = 'Gagal memuat data real-time. Pastikan kamu sudah login sebagai admin.';
+    const tbody = document.querySelector('#recentUsersTable tbody');
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#e74c3c;">Gagal memuat data.</td></tr>';
+  }
+}
+
+function seedMockDataIfNeeded(){
+  if (!localStorage.getItem('athena_mock_users')) {
+    lsSet('athena_mock_users', [
+      ...ADMIN_USERS.map(a => ({ id:'admin_'+emailKey(a.email), name:a.name, email:a.email, role:'admin', joined:'2026-01-10', banned:false })),
+      { id:'u1', name:'Dewi Anjani', email:'dewi.anjani@example.com', role:'user', joined:'2026-02-14', banned:false },
+      { id:'u2', name:'Bagas Saputra', email:'bagas.saputra@example.com', role:'user', joined:'2026-03-02', banned:false },
+      { id:'u3', name:'Nadia Putri', email:'nadia.putri@example.com', role:'user', joined:'2026-03-21', banned:true }
+    ]);
+  }
+  if (!localStorage.getItem('athena_wisdom_db')) setWisdomDb(DEFAULT_WISDOM);
+  if (!localStorage.getItem('athena_moderation')) {
+    lsSet('athena_moderation', [
+      { id:'m1', content:'Pesan yang ditandai sistem karena mengandung bahasa kasar ringan.', user:'Bagas Saputra', status:'pending' },
+      { id:'m2', content:'Permintaan refleksi tentang topik sensitif kesehatan mental.', user:'Nadia Putri', status:'pending' }
+    ]);
+  }
+  if (!localStorage.getItem('athena_feedback')) {
+    lsSet('athena_feedback', [
+      { id:'f1', user:'Dewi Anjani', rating:5, text:'Athena membantu saya melihat masalah dari sudut yang berbeda.' },
+      { id:'f2', user:'Bagas Saputra', rating:4, text:'Fitur jurnal refleksinya sangat membantu rutinitas harian saya.' }
+    ]);
+  }
+}
+
+/* Helper — ambil token session Supabase untuk dikirim ke backend */
+async function getSessionToken(){
+  if (!sb) return null;
+  const { data } = await sb.auth.getSession();
+  return data?.session?.access_token || null;
+}
+
+async function renderUsersTable(){
+  const tbody = document.getElementById('usersTableBody');
+  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-soft);"><i class="fa-solid fa-spinner fa-spin"></i> Memuat...</td></tr>';
+  try {
+    const token = await getSessionToken();
+    if (!token) throw new Error('Tidak ada sesi admin.');
+    const res  = await fetch(BACKEND_URL + '/api/admin/users', { headers: { 'Authorization': 'Bearer ' + token } });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Gagal memuat users.');
+    const users = data.users || [];
+    const search     = (document.getElementById('userSearchInput').value || '').toLowerCase();
+    const roleFilter = document.getElementById('userRoleFilter').value;
+    const filtered   = users.filter(u =>
+      ((u.name||'').toLowerCase().includes(search) || (u.email||'').toLowerCase().includes(search)) &&
+      (!roleFilter || u.role === roleFilter)
+    );
+    tbody.innerHTML = filtered.length ? filtered.map(u => `
+      <tr>
+        <td>${escapeHtml(u.name)}</td>
+        <td style="font-size:.78rem;">${escapeHtml(u.email)}</td>
+        <td><span class="badge ${u.role==='admin'?'admin':'active'}">${u.role}</span></td>
+        <td><span class="badge ${u.status==='banned'?'banned':'active'}">${u.status==='banned'?'Banned':'Active'}</span></td>
+        <td>
+          ${u.role==='admin'
+            ? '<span style="font-size:.72rem;color:var(--text-soft);">Admin</span>'
+            : `<button class="icon-btn" title="${u.status==='banned'?'Unban':'Ban'}" onclick="toggleBanUser('${u.id}','${u.status}')">
+                 <i class="fa-solid fa-${u.status==='banned'?'unlock':'ban'}"></i></button>
+               <button class="icon-btn danger" title="Hapus" onclick="deleteUser('${u.id}','${escapeHtml(u.name)}')">
+                 <i class="fa-solid fa-trash"></i></button>`}
+        </td>
+      </tr>`).join('')
+      : '<tr><td colspan="5" style="text-align:center;color:var(--text-soft);">Tidak ada pengguna ditemukan.</td></tr>';
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#e74c3c;">⚠️ ${escapeHtml(e.message)}</td></tr>`;
+  }
+}
+
+async function toggleBanUser(userId, currentStatus){
+  const action = currentStatus === 'banned' ? 'unban' : 'ban';
+  const label  = action === 'ban' ? 'ban' : 'unban';
+  confirmModal(`${label.charAt(0).toUpperCase()+label.slice(1)} pengguna ini?`, async () => {
+    try {
+      const token = await getSessionToken();
+      const res   = await fetch(`${BACKEND_URL}/api/admin/users/${userId}/${action}`, {
+        method: 'PUT', headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      showToast('Status pengguna diperbarui ✅', 'success');
+      renderUsersTable();
+    } catch(e) { showToast('Gagal: ' + e.message, 'error'); }
+  });
+}
+
+async function deleteUser(userId, name){
+  confirmModal(`Hapus pengguna "${name}" secara permanen?`, async () => {
+    try {
+      const token = await getSessionToken();
+      const res   = await fetch(`${BACKEND_URL}/api/admin/users/${userId}`, {
+        method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token }
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      showToast('Pengguna dihapus ✅', 'success');
+      renderUsersTable();
+    } catch(e) { showToast('Gagal: ' + e.message, 'error'); }
+  });
+}
+
+function renderWisdomTable(){
+  const db = getWisdomDb();
+  const filter = document.getElementById('wisdomCategoryFilter').value;
+  const filtered = filter ? db.filter(w => w.category === filter) : db;
+  const tbody = document.getElementById('wisdomTableBody');
+  tbody.innerHTML = filtered.length ? filtered.map(w => `
+    <tr>
+      <td style="max-width:340px;">${escapeHtml(w.quote)}</td>
+      <td>${escapeHtml(w.author)}</td>
+      <td><span class="wisdom-cat">${escapeHtml(w.category)}</span></td>
+      <td>
+        <button class="icon-btn" onclick="openWisdomModal('${w.id}')"><i class="fa-solid fa-pen"></i></button>
+        <button class="icon-btn danger" onclick="deleteWisdom('${w.id}')"><i class="fa-solid fa-trash"></i></button>
+      </td>
+    </tr>`).join('') : '<tr><td colspan="4" style="text-align:center;color:var(--text-soft);">Tidak ada kutipan pada kategori ini.</td></tr>';
+}
+function openWisdomModal(id){
+  const db = getWisdomDb();
+  const existing = id ? db.find(w => w.id === id) : null;
+  const root = document.getElementById('modalRoot');
+  root.innerHTML = `
+    <div class="modal-overlay" onclick="if(event.target===this) closeModal()">
+      <div class="modal-box">
+        <h3>${existing ? 'Edit' : 'Tambah'} Wisdom</h3>
+        <div class="field"><label>Kutipan</label><textarea class="journal-input" id="wisdomQuoteInput" style="min-height:70px;">${existing?escapeHtml(existing.quote):''}</textarea></div>
+        <div class="field"><label>Penulis</label><input type="text" id="wisdomAuthorInput" value="${existing?escapeHtml(existing.author):''}"></div>
+        <div class="field"><label>Kategori</label>
+          <select id="wisdomCatInput" style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);background:var(--card-solid);color:var(--text);">
+            ${['Philosophy','Buddhist','Stoic','Eastern','Inspirational'].map(c=>`<option value="${c}" ${existing&&existing.category===c?'selected':''}>${c}</option>`).join('')}
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-ghost" style="color:var(--text);background:var(--light);" onclick="closeModal()">Batal</button>
+          <button class="btn" onclick="saveWisdom('${existing?existing.id:''}')">Simpan</button>
+        </div>
+      </div>
+    </div>`;
+}
+function saveWisdom(id){
+  const quote = document.getElementById('wisdomQuoteInput').value.trim();
+  const author = document.getElementById('wisdomAuthorInput').value.trim();
+  const category = document.getElementById('wisdomCatInput').value;
+  if (!quote || !author) { showToast('Kutipan dan penulis wajib diisi', 'error'); return; }
+  let db = getWisdomDb();
+  if (id) db = db.map(w => w.id === id ? { ...w, quote, author, category } : w);
+  else db.push({ id:'w'+Date.now(), quote, author, category });
+  setWisdomDb(db);
+  closeModal();
+  renderWisdomTable();
+  showToast('Wisdom tersimpan', 'success');
+}
+function deleteWisdom(id){
+  confirmModal('Hapus kutipan ini?', () => {
+    setWisdomDb(getWisdomDb().filter(w => w.id !== id));
+    renderWisdomTable();
+    showToast('Wisdom dihapus', 'success');
+  });
+}
+function closeModal(){ document.getElementById('modalRoot').innerHTML = ''; }
+function confirmModal(message, onConfirm){
+  const root = document.getElementById('modalRoot');
+  root.innerHTML = `
+    <div class="modal-overlay" onclick="if(event.target===this) closeModal()">
+      <div class="modal-box">
+        <h3>Konfirmasi</h3>
+        <p style="font-size:.88rem;color:var(--text-soft);">${message}</p>
+        <div class="modal-actions">
+          <button class="btn btn-ghost" style="color:var(--text);background:var(--light);" onclick="closeModal()">Batal</button>
+          <button class="btn btn-danger" id="confirmActionBtn">Hapus</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('confirmActionBtn').onclick = () => { closeModal(); onConfirm(); };
+}
+
+async function renderAllConversations(){
+  const tbody = document.getElementById('allConvTableBody');
+  tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-soft);"><i class="fa-solid fa-spinner fa-spin"></i> Memuat...</td></tr>';
+  try {
+    const token = await getSessionToken();
+    if (!token) throw new Error('Tidak ada sesi admin.');
+    const res  = await fetch(BACKEND_URL + '/api/admin/conversations', { headers: { 'Authorization': 'Bearer ' + token } });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Gagal memuat percakapan.');
+    const convs = data.conversations || [];
+    tbody.innerHTML = convs.length ? convs.map(c => `
+      <tr>
+        <td>${escapeHtml(c.user_name || c.user_email || '-')}</td>
+        <td><span class="conv-mode-badge">${escapeHtml(c.mode || '-')}</span></td>
+        <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml((c.last_message||'').slice(0,60))}${(c.last_message||'').length>60?'...':''}</td>
+        <td style="font-size:.75rem;">${new Date(c.updated_at||c.created_at).toLocaleString('id-ID')}</td>
+      </tr>`).join('')
+      : '<tr><td colspan="4" style="text-align:center;color:var(--text-soft);">Belum ada percakapan tersimpan.</td></tr>';
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:#e74c3c;">⚠️ ${escapeHtml(e.message)}</td></tr>`;
+  }
+}
+
+async function refreshSystemMonitor(){
+  const latency = Math.round(80 + Math.random()*220);
+  const cpu = Math.round(15 + Math.random()*55);
+  const mem = Math.round(25 + Math.random()*50);
+  document.getElementById('mLatencyVal').textContent = latency + ' ms';
+  document.getElementById('mLatencyBar').style.width = Math.min(100, latency/4) + '%';
+  document.getElementById('mCpuVal').textContent = cpu + '%';
+  document.getElementById('mCpuBar').style.width = cpu + '%';
+  document.getElementById('mMemVal').textContent = mem + '%';
+  document.getElementById('mMemBar').style.width = mem + '%';
+  const supaStatus = document.getElementById('mSupaVal');
+  try {
+    if (!sb) throw new Error('no client');
+    await sb.auth.getSession();
+    supaStatus.textContent = 'Terhubung'; supaStatus.style.color = '#27ae60';
+  } catch(e) { supaStatus.textContent = 'Gangguan Koneksi'; supaStatus.style.color = '#e74c3c'; }
+}
+
+async function renderModerationList(){
+  const box = document.getElementById('moderationList');
+  box.innerHTML = '<div style="text-align:center;color:var(--text-soft);padding:20px;"><i class="fa-solid fa-spinner fa-spin"></i> Memuat...</div>';
+  try {
+    const token = await getSessionToken();
+    if (!token) throw new Error('Tidak ada sesi admin.');
+    const res  = await fetch(BACKEND_URL + '/api/admin/flags', { headers: { 'Authorization': 'Bearer ' + token } });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    const flags = data.flags || [];
+    const unreviewed = flags.filter(f => !f.reviewed);
+    const reviewed   = flags.filter(f =>  f.reviewed);
+
+    if (!flags.length) {
+      box.innerHTML = '<div class="empty-note">✅ Tidak ada percobaan jailbreak yang terdeteksi.</div>';
+      return;
+    }
+
+    const severityColor = { high:'#e74c3c', medium:'#f39c12', low:'#3498db' };
+    const renderFlag = (f) => `
+      <div class="feedback-card" style="border-left:3px solid ${severityColor[f.severity]||'#888'};padding-left:12px;">
+        <div style="flex:1;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+            <span class="badge ${f.severity==='high'?'banned':f.severity==='medium'?'admin':'active'}">${f.severity.toUpperCase()}</span>
+            <strong style="font-size:.82rem;">${escapeHtml(f.user_name)}</strong>
+            <span style="font-size:.72rem;color:var(--text-soft);">${escapeHtml(f.user_email)}</span>
+          </div>
+          <p style="font-size:.8rem;color:var(--text-soft);margin:0 0 4px;font-style:italic;">"${escapeHtml(f.preview)}"</p>
+          <span style="font-size:.7rem;color:var(--text-soft);">${new Date(f.created_at).toLocaleString('id-ID')}</span>
+        </div>
+        ${!f.reviewed ? `<button class="icon-btn" title="Tandai Selesai" onclick="reviewFlag('${f.id}')"><i class="fa-solid fa-check"></i></button>` : '<span style="font-size:.72rem;color:#27ae60;">✓ Ditinjau</span>'}
+      </div>`;
+
+    box.innerHTML = `
+      ${unreviewed.length ? `<p style="font-size:.78rem;font-weight:700;color:#e74c3c;margin-bottom:10px;">⚠️ ${unreviewed.length} belum ditinjau</p>${unreviewed.map(renderFlag).join('')}` : ''}
+      ${reviewed.length   ? `<p style="font-size:.78rem;font-weight:700;color:var(--text-soft);margin:14px 0 8px;">✅ Sudah ditinjau (${reviewed.length})</p>${reviewed.map(renderFlag).join('')}` : ''}`;
+  } catch(e) {
+    box.innerHTML = `<div class="empty-note" style="color:#e74c3c;">⚠️ ${escapeHtml(e.message)}</div>`;
+  }
+}
+
+async function reviewFlag(id){
+  try {
+    const token = await getSessionToken();
+    await fetch(`${BACKEND_URL}/api/admin/flags/${id}/review`, {
+      method: 'PUT', headers: { 'Authorization': 'Bearer ' + token }
+    });
+    showToast('Flag ditandai selesai ✅', 'success');
+    renderModerationList();
+  } catch(e) { showToast('Gagal: ' + e.message, 'error'); }
+}
+
+function renderFeedbackList(){
+  const items = lsGet('athena_feedback', []);
+  const box = document.getElementById('feedbackList');
+  box.innerHTML = items.length ? items.map(f => `
+    <div class="feedback-card">
+      <div>
+        <strong>${escapeHtml(f.user)}</strong>
+        <div class="stars">${'<i class="fa-solid fa-star"></i>'.repeat(f.rating)}${'<i class="fa-regular fa-star"></i>'.repeat(5-f.rating)}</div>
+        <p style="font-size:.84rem;color:var(--text-soft);margin-top:4px;">${escapeHtml(f.text)}</p>
+      </div>
+    </div>`).join('') : '<div class="empty-note">Belum ada feedback dari pengguna.</div>';
+}
+
+async function sendBroadcast(){
+  const text = document.getElementById('broadcastInput').value.trim();
+  if (!text){ showToast('Tulis pesan broadcast dulu.', 'error'); return; }
+  try {
+    const token = await getSessionToken();
+    const res   = await fetch(BACKEND_URL + '/api/admin/broadcast', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text, type: 'info' })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    document.getElementById('broadcastInput').value = '';
+    showToast('Broadcast terkirim ke semua pengguna ✅', 'success');
+    renderBroadcastInfo();
+  } catch(e) { showToast('Gagal: ' + e.message, 'error'); }
+}
+
+async function clearBroadcast(){
+  try {
+    const token = await getSessionToken();
+    await fetch(BACKEND_URL + '/api/admin/broadcast', {
+      method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token }
+    });
+    showToast('Broadcast dihapus ✅', 'success');
+    renderBroadcastInfo();
+    document.getElementById('broadcastBanner').style.display = 'none';
+  } catch(e) { showToast('Gagal: ' + e.message, 'error'); }
+}
+
+async function renderBroadcastInfo(){
+  try {
+    const res  = await fetch(BACKEND_URL + '/api/broadcast');
+    const data = await res.json();
+    const b    = data.broadcast;
+    document.getElementById('lastBroadcastInfo').textContent = b
+      ? 'Broadcast aktif (' + new Date(b.created_at).toLocaleString('id-ID') + '): "' + b.message + '"'
+      : 'Belum ada broadcast yang aktif.';
+  } catch(e) {
+    document.getElementById('lastBroadcastInfo').textContent = 'Gagal memuat info broadcast.';
+  }
+}
+
+async function checkBroadcast(){
+  try {
+    const res  = await fetch(BACKEND_URL + '/api/broadcast');
+    const data = await res.json();
+    const b    = data.broadcast;
+    if (!b) return;
+    const seenKey  = 'athena_broadcast_seen_' + (b.id || '');
+    const lastSeen = localStorage.getItem(seenKey);
+    if (lastSeen) return;
+    document.getElementById('broadcastText').textContent = b.message;
+    document.getElementById('broadcastBanner').style.display = 'flex';
+    // simpan id agar tidak muncul lagi setelah di-dismiss
+    window._currentBroadcastId = b.id;
+  } catch(e) { /* abaikan */ }
+}
+
+function dismissBroadcast(){
+  if (window._currentBroadcastId) {
+    localStorage.setItem('athena_broadcast_seen_' + window._currentBroadcastId, '1');
+  }
+  document.getElementById('broadcastBanner').style.display = 'none';
+}
+</script>
+</body>
+</html>
